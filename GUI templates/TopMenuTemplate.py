@@ -15,6 +15,7 @@ class MainWindow(QMainWindow):
         # Create the buttons before the menu bar is created
         button_action = QAction("Button 1", self)
         button_action.setStatusTip("This is button 1")
+        button_action.setCheckable(True) #Used when you want permanent check of the button
         button_action.triggered.connect(self.ButtonClick1)
 
         button_action2 = QAction("Button 2", self)
