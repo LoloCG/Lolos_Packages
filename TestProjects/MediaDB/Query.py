@@ -1,7 +1,3 @@
-# Query.py
-import sys
-import sqlite3
-import os
 from PySide6.QtWidgets import (
     QComboBox,
     QApplication,
@@ -13,18 +9,17 @@ from PySide6.QtWidgets import (
     QWidget,
     QMessageBox
 )
-from PySide6.QtCore import Qt
 from PySide6.QtGui import QFont
+from PySide6.QtCore import Qt
+import os
+import sqlite3
 
-class QueryWindow(QMainWindow):
-    def __init__(self):
+class QueryWindow(QWidget):
+    def __init__(self, main_window):
         super().__init__()
-        self.setWindowTitle("Media DB")
 
-        central_widget = QWidget()
-        self.setCentralWidget(central_widget)
-
-        layout = QVBoxLayout(central_widget)
+        self.main_window = main_window  
+        layout = QVBoxLayout(self)
 
         self.title_label = QLabel("Data Entry Form")
         self.title_label.setAlignment(Qt.AlignCenter)
@@ -58,9 +53,12 @@ class QueryWindow(QMainWindow):
 
         self.submit_button = QPushButton("Submit to DataBase")
         layout.addWidget(self.submit_button)
-
         self.submit_button.clicked.connect(self.Add2DB)
 
+        self.back_button = QPushButton("Back to Main Menu")
+        layout.addWidget(self.back_button)
+        self.back_button.clicked.connect(self.go_back)
+        
         self.setup_database()
 
     def setup_database(self):
@@ -126,8 +124,11 @@ class QueryWindow(QMainWindow):
         print(f"Recommended by: {recommended_by}")
         print(f"Tags: {media_tags}")
 
+    def go_back(self):
+        self.main_window.show_main_menu()
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = QueryWindow()
+    window = QueryWindow(None)
     window.show()
     sys.exit(app.exec())

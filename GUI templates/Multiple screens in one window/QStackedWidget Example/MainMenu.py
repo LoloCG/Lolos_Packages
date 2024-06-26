@@ -21,12 +21,7 @@ class MainWindow(QMainWindow):
         self.main_menu_widget = QWidget()
         self.stack.addWidget(self.main_menu_widget)
         main_menu_layout = QVBoxLayout(self.main_menu_widget)
-
-        # Set label for main menu
-        self.title_label = QLabel("Main Menu :3")
-        self.title_label.setAlignment(Qt.AlignCenter)
-        main_menu_layout.addWidget(self.title_label)
-
+ 
         # Create the buttons and add them to widget
         self.Widget1_Button = QPushButton("Widget 1")
         main_menu_layout.addWidget(self.Widget1_Button)
