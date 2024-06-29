@@ -26,9 +26,7 @@ class MainWindow(QMainWindow): #inhetirs from QMainWindow
         edit_menu.addAction("Undo")
         edit_menu.addAction("Redo")
 
-
         # For toolbars:
-
         toolbar = QToolBar("My main toolbar") # we set up a toolbar object
         toolbar.setIconSize(QSize(16, 16))
         self.addToolBar(toolbar) # we add it to the main window
