@@ -28,8 +28,7 @@ class Widget(QWidget):
         Checkboxes_layout.addWidget(Checkbox_3)
         Checkboxes.setLayout(Checkboxes_layout)
 
-
-    #Exclusive checkboxes
+    # Exclusive checkboxes
         Ex_Checkboxes = QGroupBox("Choose one option") # we set up the group box
         # then we set up the options
         Ex_Checkbox1 = QCheckBox("Ex_Checkbox1")
@@ -50,8 +49,7 @@ class Widget(QWidget):
         Ex_checkboxes_Layout.addWidget(Ex_Checkbox3)
         Ex_Checkboxes.setLayout(Ex_checkboxes_Layout)
 
-
-    #Radio buttons : answers
+    # Radio buttons : answers
         answers = QGroupBox("Choose Answer")
         answer_a = QRadioButton("A")
         answer_b = QRadioButton("B")
@@ -75,7 +73,7 @@ class Widget(QWidget):
 
         self.setLayout(v_layout)
 
-    # the parameter checked 
+    # Actions when clicked
     def Checkbox_1_Toggled(self,checked): 
             if(checked):
                 print("Checkbox_1 checked")
