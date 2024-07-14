@@ -5,7 +5,7 @@ def button1_clicked(data):
     print("Checked: ", data)
 
 app = QApplication()
-button = QPushButton("press for 1")
+button = QPushButton("Button")
 # this makes the button checkable, which is not by default.
     # if doing so, we can add data as seen above to show the state of the button
 button.setCheckable(True) 
