@@ -146,7 +146,9 @@ class MainWindow(QMainWindow):
     
     def populate_combo_box(self):
         self.palette_methods = {} # Initialize a dictionary to store palette method references
-    
+        
+        self.combo_box.addItem("System Default")
+
         for attr_name in dir(Palettes): # Loop that iterates over all attribute names in 'Palettes' class
             # 'attr_name'variable takes on each attribute name (as a string) in turn (e.g., "dark_palette").
 
@@ -162,9 +164,13 @@ class MainWindow(QMainWindow):
 
     def change_palette(self):
         selected_palette_name = self.combo_box.currentText().replace(' Palette', '').lower() + '_palette' # Get the selected palette name from the combo box, convert to method name format
-        palette_method = self.palette_methods.get(selected_palette_name) # Get the corresponding method from the palette_methods dictionary
-        if palette_method: # If the method exists, apply the palette
-            app.setPalette(palette_method())
+        
+        if selected_palette_name == 'system default_palette':  # Check if the system default palette is selected
+            app.setPalette(QApplication.style().standardPalette())  # Reset to the system default palette
+        else:
+            palette_method = self.palette_methods.get(selected_palette_name) # Get the corresponding method from the palette_methods dictionary
+            if palette_method: # If the method exists, apply the palette
+                app.setPalette(palette_method())
 
         print(f"Theme changed to: {selected_palette_name}")
 

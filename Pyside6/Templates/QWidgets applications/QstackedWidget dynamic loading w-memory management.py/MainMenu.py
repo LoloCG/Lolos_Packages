@@ -1,26 +1,29 @@
+# Dynamic loading of widgets with QStackedWidgets
+# Uses Memory management (show_main_menu function) to ensure that only one is loaded at a time, cleaning the previous to save memory.
 import sys
-from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QPushButton, QLabel, QStackedWidget
-
+from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, 
+    QVBoxLayout, QPushButton, QLabel, 
+    QStackedWidget # A widget that can stack multiple widgets and switch between them.
+)
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
         self.setWindowTitle("Dynamic Loading Example")
 
-        # Initialize QStackedWidget
+        # Initialize QStackedWidget and set it as the central widget
         self.stack = QStackedWidget()
         self.setCentralWidget(self.stack)
 
-        # Create main menu widget
+        # Create main menu widget, adds it to the stack, and sets a vertical layout
         self.main_menu_widget = QWidget()
         self.stack.addWidget(self.main_menu_widget)
         main_menu_layout = QVBoxLayout(self.main_menu_widget)
 
-        # Add buttons to main menu
+        # Add buttons to main menu, and connects them to show the other widgets.
         self.Widget1_Button = QPushButton("Widget 1")
         main_menu_layout.addWidget(self.Widget1_Button)
         self.Widget1_Button.clicked.connect(self.show_widget1)
-        
         self.Widget2_Button = QPushButton("Widget 2")
         main_menu_layout.addWidget(self.Widget2_Button)
         self.Widget2_Button.clicked.connect(self.show_widget2)

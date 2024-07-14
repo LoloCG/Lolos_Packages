@@ -1,4 +1,7 @@
-from PySide6.QtWidgets import QWidget, QApplication, QHBoxLayout, QVBoxLayout, QTabWidget, QPushButton, QLabel, QLineEdit,QSpacerItem
+from PySide6.QtWidgets import (
+    QWidget, QApplication, QHBoxLayout, QVBoxLayout, 
+    QTabWidget, QPushButton, QLabel, QLineEdit
+)
 import sys
 
 class Widget(QWidget):
@@ -21,7 +24,6 @@ class Widget(QWidget):
         #Buttons
         widget_buttons = QWidget()
         button_1 = QPushButton("One")
-        button_1.clicked.connect(self.button_1_clicked)
         button_2 = QPushButton("Two")
         button_3 = QPushButton("Three")
         buttons_layout = QVBoxLayout()
@@ -35,14 +37,11 @@ class Widget(QWidget):
         tab_widget.addTab(widget_form,"Information")
         tab_widget.addTab(widget_buttons,"Button")
 
-
         layout = QVBoxLayout()
         layout.addWidget(tab_widget)
-
         self.setLayout(layout)
 
 app = QApplication(sys.argv)
-
 widget = Widget()
 widget.show()
 
