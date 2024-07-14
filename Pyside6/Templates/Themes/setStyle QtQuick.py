@@ -42,10 +42,11 @@ class MainWindow(QMainWindow):
         theme = self.combo_box.currentText()
         print("theme changed to:")
         print(theme)
+        
         app.setStyle(theme)
         #QApplication.setStyle(QStyleFactory.create(theme)) This or the one before it accomplishes the same purposes
 
-sys.argv += ['-platform', 'windows:darkmode=2'] # Sets dark theme. Is required to be before the line "app = QApplication(sys.argv)".
+#sys.argv += ['-platform', 'windows:darkmode=2'] # Sets dark theme. Is required to be before the line "app = QApplication(sys.argv)".
 app = QApplication(sys.argv)
 app.setStyle('fusion') # Sets the default style as fusion
 
