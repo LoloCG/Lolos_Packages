@@ -86,7 +86,7 @@ class Palettes():
         neonPalette.setColor(QPalette.ColorGroup.Disabled, QPalette.ColorRole.ButtonText, QColor(127, 127, 127))
         neonPalette.setColor(QPalette.ColorRole.BrightText, QColor(150, 0, 150))  # Neon Pink
         neonPalette.setColor(QPalette.ColorRole.Link, QColor(0, 150, 150))  # Neon Cyan
-        neonPalette.setColor(QPalette.ColorRole.Highlight, QColor(120, 100, 80))  # Neon Yellow
+        neonPalette.setColor(QPalette.ColorRole.Highlight, QColor(55, 60, 55))  
         neonPalette.setColor(QPalette.ColorGroup.Disabled, QPalette.ColorRole.Highlight, QColor(80, 80, 80))
         neonPalette.setColor(QPalette.ColorRole.HighlightedText, QColor(57, 255, 20))
         neonPalette.setColor(QPalette.ColorGroup.Disabled, QPalette.ColorRole.HighlightedText, QColor(127, 127, 127))
@@ -137,7 +137,6 @@ class MainWindow(QMainWindow):
 
         self.combo_box = QComboBox()
         self.populate_combo_box()
-        #self.combo_box.currentIndexChanged.connect(self.change_palette) 
         layout.addWidget(self.combo_box)
 
         self.button = QPushButton("Apply Palette")
@@ -177,7 +176,7 @@ class MainWindow(QMainWindow):
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     app.setStyle('fusion')
-
+    app.setPalette(QApplication.style().standardPalette())
     window = MainWindow()
     window.show() 
     app.exec() 
