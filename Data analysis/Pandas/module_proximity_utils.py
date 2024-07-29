@@ -1,12 +1,10 @@
-# Also called "K-Nearest Neighbors", "nearest neighbor search" or "proximity search". 
 import pandas as pd
-
-# Closest two values
 
 def find_closest_value(data, column, target):
     '''
     Returns the number that is closest to the target by absolute values from a selected column of a dataframe or dictionary structure.
-
+    Also called "Simple K-Nearest Neighbors", "nearest neighbor search" or "proximity search". 
+    
     Parameters:
     data (pd.DataFrame, dictionary, or list): The data structure containing the data.
     column (str): The name of the column to search.
