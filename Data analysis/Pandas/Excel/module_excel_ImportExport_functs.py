@@ -15,7 +15,10 @@ import pandas as pd
     # used to directly open .csv files and load them into a dictionary DataFrame, as these do not have multiple sheets. 
         # df_dict = pd.read_csv(file_path)
         # Some cases may require to specify the encoding, delimiter and to skip rows
-        # df_raw = pd.read_csv(file_path, encoding='utf-16', delimiter=';', skiprows=1)
+        # df_dict = pd.read_csv(file_path, encoding='utf-16', delimiter=';', skiprows=1)
+
+    # To change from "," to "." in a column:
+        # dataframe['column'] = dataframe['column'].str.replace(',', '.').astype(float)
 
 def show_folder_excel_files(folder_dir, file_type = None):
     '''
