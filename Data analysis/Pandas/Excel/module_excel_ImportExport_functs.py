@@ -1,24 +1,15 @@
 import os
 import pandas as pd
 
-# important functions:
-    # to import module use, Add the directory containing your module to sys.path, then import the module:
-        #import sys
+# to import module use, add the directory containing your module to sys.path, then import the module:
+    #import sys
 
-        # sys.path.append(r'C:\Users\Lolo\Desktop\Programming\GITRepo\PythonLearn-Resources\Data analysis\Pandas\Excel')
-        # module_excel_ImportExport_functs = __import__('module_excel_ImportExport_functs')
+    # sys.path.append(r'C:\Users\Lolo\Desktop\Programming\GITRepo\PythonLearn-Resources\Data analysis\Pandas\Excel')
+    # module_excel_ImportExport_functs = __import__('module_excel_ImportExport_functs')
 
-    # the two following used to obtain the path of the script, then to join them with the file selected.
-        # main_dir = os.path.dirname(os.path.abspath(__file__))
-        # file_path = os.path.join(main_dir, chosen_file)
-
-    # used to directly open .csv files and load them into a dictionary DataFrame, as these do not have multiple sheets. 
-        # df_dict = pd.read_csv(file_path)
-        # Some cases may require to specify the encoding, delimiter and to skip rows
-        # df_dict = pd.read_csv(file_path, encoding='utf-16', delimiter=';', skiprows=1)
-
-    # To change from "," to "." in a column:
-        # dataframe['column'] = dataframe['column'].str.replace(',', '.').astype(float)
+# the two following used to obtain the path of the script, then to join them with the file selected.
+    # main_dir = os.path.dirname(os.path.abspath(__file__))
+    # file_path = os.path.join(main_dir, chosen_file)
 
 def show_folder_excel_files(folder_dir, file_type = None):
     '''
