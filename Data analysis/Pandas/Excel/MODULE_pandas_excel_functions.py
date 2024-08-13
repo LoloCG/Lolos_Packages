@@ -4,7 +4,7 @@ import pandas as pd
 class ExcelDataExtract:
     def __init__(self, file_folder_dir = None, chosen_file = None):
         self.main_dir = os.path.dirname(os.path.abspath(__file__))
-        self.file_folder_dir = None
+        self.file_folder_dir = file_folder_dir
         self.chosen_file = None
         self.file_type = None
 
@@ -29,8 +29,13 @@ class ExcelDataExtract:
         #DEBUG: print(f"debug. df type: {self.dataframe_type}\n")
 
     def load_csv_to_dataframe(self, chosen_file, encoding=None, delimiter=None, skiprows=None):
-        targetfile_path = os.path.join(self.main_dir, chosen_file)
+        self.chosen_file = chosen_file
+        print(f"target file folder path = {self.file_folder_dir}")
+        print(f"chosen file {self.chosen_file}")
+        targetfile_path = os.path.join(self.file_folder_dir, self.chosen_file)
+
         print(f"Extracting file {chosen_file}")
+        
         df_raw = pd.read_csv(targetfile_path, encoding='utf-16', delimiter='\t', skiprows=1) # TODO: make dynamic selector of encoding, delimiter, skiprows...
         
         #DEBUG: print(f"Extracted df:\n{df_raw.head()}") 
