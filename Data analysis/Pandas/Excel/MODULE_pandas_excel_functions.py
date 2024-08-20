@@ -30,11 +30,9 @@ class ExcelDataExtract:
 
     def load_csv_to_dataframe(self, chosen_file, encoding=None, delimiter=None, skiprows=None):
         self.chosen_file = chosen_file
-        print(f"target file folder path = {self.file_folder_dir}")
-        print(f"chosen file {self.chosen_file}")
-        targetfile_path = os.path.join(self.file_folder_dir, self.chosen_file)
 
-        print(f"Extracting file {chosen_file}")
+        targetfile_path = os.path.join(self.file_folder_dir, self.chosen_file)
+        print(f"Extracting file {chosen_file} from path {targetfile_path}")
         
         df_raw = pd.read_csv(targetfile_path, encoding='utf-16', delimiter='\t', skiprows=1) # TODO: make dynamic selector of encoding, delimiter, skiprows...
         
