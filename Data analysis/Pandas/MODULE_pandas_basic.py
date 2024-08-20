@@ -5,19 +5,13 @@ class DataCleaner:
     def __init__(self, dataframe: pd.DataFrame):
         self.dataframe = dataframe
 
-    def convert_dataframe_dates(self, removeDateCol=False):
-        '''
-        Converts a dataframe with unformatted dates into the datetime type of pandas.
-
-        Parameters
-            df (DataFrame), the raw dataframe without formatted datetime date variables.
-            removeDateCol (bool), wether to keep (False) or delete (True) the old column of dates. Default false.
-        '''
+    def convert_dataframe_dates(self, dateColumn, removeDateCol=False):
+    
         print("Converting dataframe dates into datatime type...")
         #DEBUG: print("DataFrame columns before conversion:", list(self.dataframe.columns))
         
-        if 'Start Date' not in self.dataframe.columns:
-            raise KeyError("The DataFrame does not contain a 'Start Date' column.")
+        #if 'Start Date' not in self.dataframe.columns:
+        #    raise KeyError("The DataFrame does not contain a 'Start Date' column.")
         
         df = self.dataframe
 
@@ -32,30 +26,48 @@ class DataCleaner:
 
         self.dataframe = df
 
-    def basic_raw_pretreatment(self):
-        '''
-        Does a basic precleaning of the dataset required for most typical functions required for analyzing academic study hours
+    def normalize_strings(self, columnName):
+        df = self.dataframe
+        df[columnName] = df[columnName].str.strip().str.lower()
+        self.dataframe = df
+    
+    def convert_comma_to_dot(self, columnName=None, replaceWhat = None, replaceWith = None):
+        df = self.dataframe
 
-        Parameters
-            df_raw (DataFrame), the raw dataframe without pre-treatment
+        if replaceWhat is None and replaceWith is None:
+            replaceWhat = ','
+            replaceWith = '.'
+        elif replaceWhat is ',':
+            replaceWith = '.' #TODO: make this more dynamic... somehow...
 
-        Returns
-            df_clean (DataFrame)
-        '''
-        print("Doing data pre-treatment...")
-        last_column = 'Path'
-        df_raw = self.dataframe
+        print(f"Replacing '{replaceWhat}' with '{replaceWith}' in column {columnName}")
 
-        # Splits the last column into 3, adds them into df_raw  
-        df_raw[['Period', 'Subject', 'Path3']] = df_raw[last_column].str.split('\\', n=2, expand=True)
+        try:
+            # Check if columnName is None or invalid
+            if columnName is None:
+                raise ValueError("Column name cannot be None.")
+            
+            if columnName not in df.columns:
+                raise KeyError(f"Column '{columnName}' does not exist in the DataFrame.")
+            
+            # Perform the replacement operation
+            df[columnName] = df[columnName].str.replace(replaceWhat, replaceWith).astype(float)
 
-        df_raw['Time Spent (Hrs)'] = df_raw['Time Spent (Hrs)'].str.replace(',', '.').astype(float) # Replaces commas with dots and convert to numeric the column of time spent
-        
-        df_raw['Subject'] = df_raw['Subject'].str.strip().str.lower() # Normalize the subject names
+        except Exception as e:
+            # Catch all other exceptions
+            print(f"An unexpected error occurred: {e}")
+            raise
+            
+        self.dataframe = df
 
-        # print(f"Pre-cleaned data:\n{df_clean.head(3)}")
-        
-        self.dataframe = df_raw
+    def split_column_multiple(self, columnName, separator, newColList, separatorNum = None, expand = True):
+        df = self.dataframe
+        print(f"Splitting column '{columnName}' into '{list(newColList)}'...")
+        if separatorNum is None:
+            separatorNum = 2
+
+        df[newColList] = df[columnName].str.split(separator, n=separatorNum, expand=expand)
+        self.dataframe = df
 
     def show_missing_files(self):
         df_raw = self.dataframe
@@ -63,11 +75,10 @@ class DataCleaner:
             empty_columns = df_raw.columns[df_raw.isnull().any()]
 
             if len(empty_columns) > 0:
-                print(f"\nColumns that have empty values: ")
+                print(f"Columns that have empty values: ")
                 for column in empty_columns:
                     empty_values = df_raw[column].isnull().sum()
-                    # empty_values = df_raw[column[df_raw.isnull().sum()]]
-                    print(f"- '{column}', with {empty_values}")
+                    print(f"\t'{column}', with {empty_values}")
 
                     if empty_values == len(df_raw):
                         print(f"column '{column}' is completely empty ")
@@ -77,7 +88,6 @@ class DataCleaner:
 class DataFrameTransformer:
     def __init__(self, dataframe: pd.DataFrame):
         self.dataframe = dataframe
-        print()
 
     def pivot_dataframe(self):
         df = self.dataframe
@@ -112,7 +122,7 @@ class DataFrameTransformer:
 
         self.dataframe = df
 
-
+# ============== UNUSED CODE ==================
 def find_closest_value(data, column, target):
     '''
     Returns the number that is closest to the target by absolute values from a selected column of a dataframe or dictionary structure.
