@@ -15,16 +15,26 @@ class ExcelDataExtract:
         self.dataframe = None
         self.dataframe_type = None
 
-    def load_excel_to_dataframe_dict(self, selected_sheets=None):
+    def load_excel_to_dataframe_dict(self, selected_sheets=None, importNaN=True):
         df_dict = {}
         full_file_path = os.path.join(self.file_folder_dir, self.chosen_file)
 
+        sheets_to_load = selected_sheets if selected_sheets else self.selected_sheets
+
         for sheet in self.selected_sheets:
             print(f"loading {sheet} into dataframe dictionary")
-            df_dict[sheet] = pd.read_excel(full_file_path, sheet_name=sheet)
+
+            df = pd.read_excel(full_file_path, sheet_name=sheet)
+            
+            if importNaN: # First drops columns that have NaN or empty string as headers, then columns where all values are NaN
+                df = df.loc[:, df.columns.notnull()]
+                df = df.loc[:, df.columns != '']
+                df = df.dropna(axis=1, how='all')
+                
+            df_dict[sheet] = df
 
         self.dataframe = df_dict
-        self.dataframe_type = type(self.dataframe) # This should get the dataframe type to <class 'dict'>
+        self.dataframe_type = type(self.dataframe) # Ensures that the dataframe type is <class 'dict'>
         
         #DEBUG: print(f"debug. df type: {self.dataframe_type}\n")
 
