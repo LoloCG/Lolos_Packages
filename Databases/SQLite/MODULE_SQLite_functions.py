@@ -4,6 +4,13 @@ import os
 r'''
 sys.path.append(r'C:\Users\Lolo\Desktop\Programming\GITRepo\PythonLearn-Resources\Databases\SQLite')
 import MODULE_SQLite_functions
+
+TODO:
+    - create "check_db_connection" internal method, where it uses the following code + other error handling techniques...         
+        if self.connector is None or self.cursor is None:
+            print(f"DEBUG: connector or cursor is None, creating connection to db")
+            self.connector = sqlite3.connect(self.db_path)
+            self.cursor = self.connector.cursor()
 '''
 
 class DatabaseHandler:
@@ -106,20 +113,26 @@ class DatabaseHandler:
         self.connector.commit()
 
     def close_connection(self):
+        if self.cursor:
+            self.cursor.close()
+            self.cursor = None
         if self.connector:
             self.connector.close()
-
+            self.connector = None
+            
     def retrieve_data_as_df(self, tableName=None):
         if tableName is None and self.main_table_name is None:
-            print(f"tablename={tableName}, selfmaintablename={self.main_table_name}")
             raise BaseException(f"Database table name and main table name are None.")
         elif tableName is None:
-            print(f"DEBUG: table name is None when retrieving data...\ntable name attribute is {self.main_table_name}")
+            print(f"DEBUG: table name is None when retrieving data...\ntable name used is {self.main_table_name}")
             tableName = self.main_table_name
-            
-        if self.connector is None:
+
+        if self.connector is None or self.cursor is None:
+            print(f"DEBUG: connector or cursor is None, creating connection to db")
             self.connector = sqlite3.connect(self.db_path)
             self.cursor = self.connector.cursor()
+        else:
+            print(f"DEBUG: Using existing connection and cursor")
 
         self.cursor.execute(f'SELECT * FROM {tableName}')
 
@@ -134,7 +147,6 @@ class DatabaseHandler:
         
         return df
 
-        # self.cursor.fetchall()
 class Unused:
     def check_db_isupdated(self, newData): #TODO: not implemented nor tested at the moment
 
