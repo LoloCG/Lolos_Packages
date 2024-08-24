@@ -1,107 +1,129 @@
 import pandas as pd
-import os
-
+import os, inspect
+"""
+TODO:
+    - add docstring to classes and functions:
+        - convert_dataframe_dates
+        - normalize_column_strings
+        - convert_comma_to_dot
+        - split_column_into_multiple
+        - show_missing_files
+        - check_columnName_present
+    - try to make convert_comma_to_dot more dynamic somehow
+    - make check_columnName_present internal method, complete it, and verify if its correctly done. 
+"""
 class DataCleaner:
     def __init__(self, dataframe: pd.DataFrame):
         self.dataframe = dataframe
 
-    def convert_dataframe_dates(self, dateColumn, removeDateCol=False):
-    
-        print("Converting dataframe dates into datatime type...")
-        #DEBUG: print("DataFrame columns before conversion:", list(self.dataframe.columns))
+    def check_columnName_present(self,columnName):
+        try:
+            if columnName is None: raise ValueError("Column name cannot be None.")
+            
+            if columnName not in self.dataframe.columns: raise KeyError(f"Column '{columnName}' does not exist in the DataFrame.")
         
-        #if 'Start Date' not in self.dataframe.columns:
-        #    raise KeyError("The DataFrame does not contain a 'Start Date' column.")
+        except (ValueError, KeyError) as e:
+            caller = inspect.stack()[1].function
+            print(f"Error in function '{caller}': {e}")
+            raise
+        
+        except Exception as e:
+            # Catch all other unexpected exceptions
+            caller = inspect.stack()[1].function
+            print(f"An unexpected error occurred in function '{caller}': {e}")
+            raise
+
+    def convert_dataframe_dates(self, dateColumn, removeDateCol=True):
+        self.check_columnName_present(dateColumn)
+        print("Converting dataframe dates into datatime type...")
         
         df = self.dataframe
-
-        df['date'] = pd.to_datetime(df['Start Date'])
+        if pd.api.types.is_datetime64_any_dtype(df[dateColumn]):
+            print(f"Column {dateColumn} is already datetime type...")
+            return
+        
+        df['date'] = pd.to_datetime(df[dateColumn])
         # Extract year, month, and day 
         df['year'] = df['date'].dt.year 
         df['month'] = df['date'].dt.month 
         df['day'] = df['date'].dt.day
 
         if removeDateCol:
-            df.drop('Start Date', axis=1,inplace=True)
+            df.drop(dateColumn, axis=1,inplace=True)
 
         self.dataframe = df
 
-    def normalize_strings(self, columnName):
+    def normalize_column_strings(self, columnName, normHead=True, normItems=True):
+        self.check_columnName_present(columnName)
         df = self.dataframe
-        df[columnName] = df[columnName].str.strip().str.lower()
+        
+        if normItems: df[columnName] = df[columnName].str.strip().str.lower().str.title()
+
+        if normHead: df.columns = df.columns.str.strip().str.lower().str.title()
+
         self.dataframe = df
-    
-    def convert_comma_to_dot(self, columnName=None, replaceWhat = None, replaceWith = None):
+
+    def convert_comma_to_dot(self, columnName, replaceWhat=None, replaceWith=None):
+        self.check_columnName_present(columnName)
         df = self.dataframe
 
-        if replaceWhat is None and replaceWith is None:
+        if replaceWhat is None and replaceWith is None: #TODO: make this more dynamic... somehow...
             replaceWhat = ','
             replaceWith = '.'
-        elif replaceWhat is ',':
-            replaceWith = '.' #TODO: make this more dynamic... somehow...
+        elif replaceWhat == ',':
+            replaceWith = '.' 
 
         print(f"Replacing '{replaceWhat}' with '{replaceWith}' in column {columnName}")
 
-        try:
-            # Check if columnName is None or invalid
-            if columnName is None:
-                raise ValueError("Column name cannot be None.")
-            
-            if columnName not in df.columns:
-                raise KeyError(f"Column '{columnName}' does not exist in the DataFrame.")
-            
-            # Perform the replacement operation
-            df[columnName] = df[columnName].str.replace(replaceWhat, replaceWith).astype(float)
+        # Perform the replacement operation
+        df[columnName] = df[columnName].str.replace(replaceWhat, replaceWith).astype(float)
 
-        except Exception as e:
-            # Catch all other exceptions
-            print(f"An unexpected error occurred: {e}")
-            raise
-            
         self.dataframe = df
 
-    def split_column_multiple(self, columnName, separator, newColList, separatorNum = None, expand = True):
+    def split_column_into_multiple(self, columnName, separator, newColList, expand=True):
+        self.check_columnName_present(columnName)
         df = self.dataframe
         print(f"Splitting column '{columnName}' into '{list(newColList)}'...")
-        if separatorNum is None:
-            separatorNum = 2
+        
+        separatorNum = len(newColList)-1
 
         df[newColList] = df[columnName].str.split(separator, n=separatorNum, expand=expand)
         self.dataframe = df
 
-    def show_missing_files(self):
-        df_raw = self.dataframe
-        if df_raw.isnull().any().any():
-            empty_columns = df_raw.columns[df_raw.isnull().any()]
-
-            if len(empty_columns) > 0:
-                print(f"Columns that have empty values: ")
-                for column in empty_columns:
-                    empty_values = df_raw[column].isnull().sum()
-                    print(f"\t'{column}', with {empty_values}")
-
-                    if empty_values == len(df_raw):
-                        print(f"column '{column}' is completely empty ")
-        else:
-            print("No missing values in the dataset.")
-
-class DataFrameTransformer:
-    def __init__(self, dataframe: pd.DataFrame):
-        self.dataframe = dataframe
-
-    def pivot_dataframe(self):
+    def show_missing_files(self, returning=False, verbose=False):
         df = self.dataframe
-        # (index='indexCol', columns='columns', values='valueColumns')
 
-        self.dataframe = df
+        col_with_empty = {}
+        if df.isnull().any().any():
+            df_with_empty = df.columns[df.isnull().any()]
 
-    def filter_df_column_by_val(self,ColToFilter,FilterValues):
+            print(f"Columns that have empty values: ") if verbose else None
+            for column in df_with_empty:
+                empty_sum = df[column].isnull().sum()
+                print(f"\t'{column}', with {empty_sum}") if verbose else None
+                col_with_empty[column] = int(empty_sum)
+                
+                if empty_sum == len(df):
+                    print(f"column '{column}' is completely empty ") if verbose else None
+                    #empty_col.append(column)
+        else:           
+            print("No missing values in the dataset.")
+            
+        if returning:
+            return col_with_empty
+
+    def filter_df_column_by_val(self, ColToFilter, FilterValues):
+        self.check_columnName_present(ColToFilter)
         print(f"Filtering dataframe for values {list(FilterValues)} located in column '{ColToFilter}'...")
 
         df = self.dataframe
         df = df[df[ColToFilter].isin(FilterValues)]
         self.dataframe = df
     
+class DataFrameTransformer:
+    def __init__(self, dataframe: pd.DataFrame):
+        self.dataframe = dataframe
+
     def multiIndex_group(self, colsToGroup):
         '''
         From a dataframe of 3 columns, groups the numerical values by 
