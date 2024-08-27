@@ -41,8 +41,12 @@ class DatabaseHandler:
         self.database_name = None
         self.main_table_name = None
 
-    def settup_db(self, tableItems, mainTable_name=None):
-    
+    def create_db_table(self, tableItems, mainTable_name=None):
+        '''
+        tableItems (dict), key = str, item = SQLdatatype
+        mainTable_name (str)
+
+        '''
         print(f"Setting database {self.db_name} with direction {self.db_path}")
         self.connector = sqlite3.connect(self.db_path)
 
@@ -63,16 +67,17 @@ class DatabaseHandler:
             {columns}
         )
         '''
-
         self.cursor.execute(create_table_query)
-        self.connector.commit()  # Save the changes to the database
+        self.connector.commit()
 
     def convert_dict_valType_to_sqlType(self, dtype_dict):
-        print("Converting values from dtype to SQL type values...")
+        #print("Converting values from dtype to SQL type values...")
         
         sql_dict = {}
 
-        for key, dtype in dtype_dict.items():
+        for key, item in dtype_dict.items():
+            dtype = type(item)
+
             sql_type = None
             if dtype in [int, 'int64', 'int32']:            # Handling ints
                 sql_type = 'INTEGER'
@@ -81,12 +86,15 @@ class DatabaseHandler:
             elif dtype == str or dtype == 'O':              # Handling strings and object types
                 sql_type = 'TEXT'
             elif str(dtype).startswith('datetime64'):       # Handling datetime from Pandas
-                sql_type = 'TEXT'  
-                # alternatively, use DATETIME format if required...
+                sql_type = 'TEXT'  # alternatively, use DATETIME format if required...
+                
+            elif dtype == list:
+                print(f"!!! - List datatype in dictionary ({key}). Will be stored as concatenated string.")
+                sql_type = 'TEXT' 
             else:
                 raise ValueError(f"Unrecognized dtype ({dtype}) key: {key}")
                 pass
-            #DEBUG: print(f"Key ({key}) set as {sql_type}")
+            #print(f"DEBUG: Key ({key}) set as {sql_type}")
             
             sql_dict[key] = sql_type
         
