@@ -37,7 +37,7 @@ class DatabaseHandler:
         self.main_table_name = None
         self.db_table_names = []
 
-    def create_db_table(self, table_items, table_name=None, verbose=None):
+    def create_db_table(self, table_items, table_name=None, verbose=False):
         '''
         table_items (dict), key = str, item = SQLdatatype
         mainTable_name (str)
@@ -74,27 +74,29 @@ class DatabaseHandler:
         self.cursor.execute(create_table_query)
         self.connector.commit()
 
-    def convert_dict_valType_to_sqlType(self, dtype_dict):
-        #print("Converting values from dtype to SQL type values...")
+    def convert_dict_valType_to_sqlType(self, dtype_dict,verbose=False):
+        import numpy as np
+        import pandas as pd
+
+        if verbose: print("Converting values from dtype to SQL type values...")
         
         sql_dict = {}
-
         for key, item in dtype_dict.items():
-            dtype = type(item)
+            dtype = item
 
             sql_type = None
-            if dtype in [int, 'int64', 'int32']:            # Handling ints
+            # Use pandas and numpy functions to determine the dtype category
+            if pd.api.types.is_integer_dtype(dtype):
                 sql_type = 'INTEGER'
-            elif dtype in [float, 'float64', 'float32']:    # Handling floats
-                sql_type = 'REAL'  
-            elif dtype == str or dtype == 'O':              # Handling strings and object types
+            elif pd.api.types.is_float_dtype(dtype):
+                sql_type = 'REAL'
+            elif pd.api.types.is_string_dtype(dtype) or dtype == 'O':  # 'O' for object types
                 sql_type = 'TEXT'
-            elif str(dtype).startswith('datetime64'):       # Handling datetime from Pandas
+            elif pd.api.types.is_datetime64_any_dtype(dtype):
                 sql_type = 'TEXT'  # alternatively, use DATETIME format if required...
-                
             elif dtype == list:
                 print(f"!!! - List datatype in dictionary ({key}). Will be stored as concatenated string.")
-                sql_type = 'TEXT' 
+                sql_type = 'TEXT'
             else:
                 raise ValueError(f"Unrecognized dtype ({dtype}) key: {key}")
                 pass
