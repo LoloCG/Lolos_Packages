@@ -1,6 +1,9 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 
+# ========================= MODULE_matplot_pandas/DataPlotter =========================
+# =================================== 2024/02/09 =========================
+
 class DataPlotter:
     def __init__(self, dataframe: pd.DataFrame):
         self.dataframe = dataframe
@@ -40,6 +43,19 @@ class DataPlotter:
         self.highest_hierarchy_column = first_hier_col        
         self.categorical_columns = cat_cols
         self.numerical_columns = Num_col
+
+    def plot_stacked_bar_chart(self):
+        print()
+        clean_dataframe.plot(kind='bar', stacked=True, figsize=(10, 6))
+
+        plt.title('Weekly Hours Spent on Subjects')
+        plt.xlabel('Week')
+        plt.ylabel('Time Spent (Hrs)')
+        plt.legend(title='Subject')
+        plt.xticks(rotation=45)
+        plt.tight_layout()
+
+        plt.show()
 
     def plot_hierarchical_categorical_bar_chart(self):
         """

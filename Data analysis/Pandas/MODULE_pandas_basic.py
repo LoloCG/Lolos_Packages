@@ -1,17 +1,21 @@
 import pandas as pd
 import os, inspect
+r"""
+    sys.path.append(r'C:\Users\Lolo\Desktop\Programming\GITRepo\PythonLearn-Resources\Data analysis\Pandas')    
+    from MODULE_pandas_basic import DataCleaner, DataFrameTransformer
+    TODO:
+        - add docstring to classes and functions:
+            - convert_dataframe_dates
+            - normalize_column_strings
+            - convert_comma_to_dot
+            - split_column_into_multiple
+            - show_missing_files
+            - check_columnName_present
+        - try to make convert_comma_to_dot more dynamic somehow
+        - make check_columnName_present internal method, complete it, and verify if its correctly done. 
 """
-TODO:
-    - add docstring to classes and functions:
-        - convert_dataframe_dates
-        - normalize_column_strings
-        - convert_comma_to_dot
-        - split_column_into_multiple
-        - show_missing_files
-        - check_columnName_present
-    - try to make convert_comma_to_dot more dynamic somehow
-    - make check_columnName_present internal method, complete it, and verify if its correctly done. 
-"""
+# ========================= MODULE_pandas_basic/DataCleaner =========================
+# =================================== 2024/02/09 =========================
 class DataCleaner:
     def __init__(self, dataframe: pd.DataFrame):
         self.dataframe = dataframe
@@ -119,7 +123,9 @@ class DataCleaner:
         df = self.dataframe
         df = df[df[ColToFilter].isin(FilterValues)]
         self.dataframe = df
-    
+
+# ========================= MODULE_pandas_basic/DataFrameTransformer =========================
+# =================================== 2024/02/09 =========================
 class DataFrameTransformer:
     def __init__(self, dataframe: pd.DataFrame):
         self.dataframe = dataframe

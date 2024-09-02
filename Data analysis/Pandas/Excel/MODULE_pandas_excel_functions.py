@@ -1,6 +1,11 @@
 import os
 import pandas as pd
-
+r'''
+sys.path.append(r'C:\Users\Lolo\Desktop\Programming\GITRepo\PythonLearn-Resources\Data analysis\Pandas\Excel')
+from MODULE_pandas_excel_functions import ExcelDataExtract
+'''
+# ========================= MODULE_pandas_excel_functions/ExcelDataExtract =========================
+# =================================== 2024/02/09 =========================
 class ExcelDataExtract:
     def __init__(self, file_folder_dir = None, chosen_file = None):
         self.main_dir = os.path.dirname(os.path.abspath(__file__))

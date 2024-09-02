@@ -4,10 +4,9 @@ import os
 r'''
 sys.path.append(r'C:\Users\Lolo\Desktop\Programming\GITRepo\PythonLearn-Resources\Databases\SQLite')
 import MODULE_SQLite_functions
-
-TODO:
-    - create "check_db_connection" internal method, wwhere it uses the folloing code + other error handling techniques...         
 '''
+# ========================= MODULE_SQLite_functions/DatabaseHandler =========================
+# =================================== 2024/02/09 =========================
 
 class DatabaseHandler:
     def __init__(self, db_dir, db_name=None):
@@ -82,30 +81,29 @@ class DatabaseHandler:
         
         sql_dict = {}
         for key, item in dtype_dict.items():
-            dtype = item
 
             sql_type = None
             # Use pandas and numpy functions to determine the dtype category
-            if pd.api.types.is_integer_dtype(dtype):
+            if pd.api.types.is_integer_dtype(item) or isinstance(item, int):
                 sql_type = 'INTEGER'
-            elif pd.api.types.is_float_dtype(dtype):
+            elif pd.api.types.is_float_dtype(item) or isinstance(item, str):
                 sql_type = 'REAL'
-            elif pd.api.types.is_string_dtype(dtype) or dtype == 'O':  # 'O' for object types
+            elif pd.api.types.is_string_dtype(item) or item == 'O':  # 'O' for object types
                 sql_type = 'TEXT'
-            elif pd.api.types.is_datetime64_any_dtype(dtype):
+            elif pd.api.types.is_datetime64_any_dtype(item):
                 sql_type = 'TEXT'  # alternatively, use DATETIME format if required...
-            elif dtype == list:
+            elif item == list:
                 print(f"!!! - List datatype in dictionary ({key}). Will be stored as concatenated string.")
                 sql_type = 'TEXT'
             else:
-                raise ValueError(f"Unrecognized dtype ({dtype}) key: {key}")
+                raise ValueError(f"Unrecognized dtype ({type(item)}) key: {key}")
                 pass
             #print(f"DEBUG: Key ({key}) set as {sql_type}")
             
             sql_dict[key] = sql_type
         
         return sql_dict
-    
+
     def check_db_existance(self): 
         """Check if the SQLite database file already exists.
 
@@ -127,7 +125,7 @@ class DatabaseHandler:
         self.cursor.execute(f"SELECT COUNT(1) FROM {table_name};")
         return self.cursor.fetchone()[0] > 0
 
-    def insert_data_from_df(self, dataframe,table_name=None):
+    def insert_data_from_df(self, dataframe,table_name=None, verbose=False):
         import pandas as pd
         if not isinstance(dataframe, pd.DataFrame):
             raise TypeError(f"The variable passed to insert data to database is not dataframe type. It is '{type(dataframe)}'")
@@ -138,7 +136,7 @@ class DatabaseHandler:
         try:
             dataframe.to_sql(table_name, self.connector, if_exists='append', index=False)
             self.connector.commit()
-            print(f"Data inserted successfully into {table_name}")
+            if verbose: print(f"Data inserted successfully into {table_name}")
             
         except sqlite3.Error as e:
             print(f"An error occurred: {e}")
@@ -152,7 +150,7 @@ class DatabaseHandler:
         if self.connector:
             self.connector.close()
             self.connector = None
-   
+
     def check_db_connection(self, connect=False):
         if self.connector is None or self.cursor is None:
             if connect == True:
@@ -332,8 +330,6 @@ def update_db(self, newData): #TODO: not implemented nor tested at the moment
     insert_query = f"INSERT INTO tasks ({keys}) VALUES ({question_marks})"
     self.cursor.execute(insert_query, values)
     self.connector.commit()
-
-
 
 def update_db(self, update_data, identifier):
     """Updates a row in the tasks table based on a unique identifier."""
