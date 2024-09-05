@@ -6,7 +6,7 @@ sys.path.append(r'C:\Users\Lolo\Desktop\Programming\GITRepo\PythonLearn-Resource
 import MODULE_SQLite_functions
 '''
 # ========================= MODULE_SQLite_functions/DatabaseHandler =========================
-# =================================== 2024/02/09 =========================
+# =================================== 05.09.2024 =========================
 
 class DatabaseHandler:
     def __init__(self, db_dir, db_name=None):
@@ -297,12 +297,83 @@ class DatabaseHandler:
             self.connector.commit()
             if verbose: 
                 print(f"Data inserted successfully into {table_name}")
-                print(f"\tinserted: {len(values)} values")
+                print(f"\tinserted: {len(values)} values ({values})")
             
         except sqlite3.Error as e:
             print(f"An error occurred: {e}")
             self.connector.rollback()
 
+    def bulk_update_rows(self, update_list_dicts, update_cols_list, table_name=None, verbose=False):
+        '''
+            Updates columns of multiple rows in the database using a batch operation.
+
+            Parameters:
+                - update_list_dicts: A list of dictionaries, where each dictionary contains the data for the update in the format
+                    of key = column name, value = value to search for or to update.
+                - update_cols_list (str): A list of columns to be updated in each row.
+                - table_name: Optional. The table to update (defaults to self.main_table_name if not provided).
+                - verbose: Optional. Prints detailed logs if True.
+
+            Ensures all updates are executed within a single transaction, rolling back on error.
+    
+            # Example data for 2 exercises:
+                update_cols_list = ['reps_list','sets_performed']
+                update_list_dicts = [ 
+                    {'reps_list':           '10,9,8',
+                    'sets_performed':       3,
+                    'microcycle_num':       1,
+                    'session_num':          1,
+                    'exercise_name':        'High bar squats'},
+                    'reps_list':            '10,10,8,7',
+                    'sets_performed':       4,
+                    'microcycle_num':       1,
+                    'session_num':          1,
+                    'exercise_name':        'Bench press'}]
+        '''
+        if not table_name:
+            table_name = self.main_table_name
+        
+        self.check_db_connection(self, connect=True)
+
+        try:
+            if verbose: print(f"Queries of 'bulk_update_rows' method:")
+            for update_dict in update_list_dicts:
+                set_clause = None
+                where_clause = None
+                set_values = []
+                where_values = []
+
+                
+                for dict_key, dict_val in update_dict.items():
+                    # Construct the SET clause
+                    if dict_key in update_cols_list:
+                        if set_clause is None: 
+                            set_clause = f"{dict_key} = ?"
+                        else:
+                            set_clause = f"{set_clause}, {dict_key} = ?"
+                        set_values.append(dict_val)
+
+                    # Construct the WHERE clause
+                    else:
+                        if where_clause is None:
+                            where_clause = f" {dict_key} = ?"
+                        else:
+                            where_clause = f"{where_clause} AND {dict_key} = ?"
+                        where_values.append(dict_val)
+
+                query = f"UPDATE {table_name} SET {set_clause} WHERE {where_clause}"
+                if verbose: print(f"\t{query}")
+                self.cursor.execute(query, tuple(set_values + where_values))
+
+            self.connection.commit()
+            if verbose: print("Bulk update of database successful.")
+
+        except sqlite3.Error as e:
+            self.connection.rollback()
+            print(f"An error occurred: {e}")
+
+        finally:
+            self.close_connection()
 
 # ==================== NOT USED ====================
 def check_db_isupdated(self, newData): #TODO: not implemented nor tested at the moment
