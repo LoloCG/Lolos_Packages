@@ -333,9 +333,11 @@ class DatabaseHandler:
         if not table_name:
             table_name = self.main_table_name
         
-        self.check_db_connection(self, connect=True)
+        self.check_db_connection(connect=True)
 
         try:
+            self.cursor.execute("BEGIN TRANSACTION;")
+
             if verbose: print(f"Queries of 'bulk_update_rows' method:")
             for update_dict in update_list_dicts:
                 set_clause = None
@@ -362,14 +364,15 @@ class DatabaseHandler:
                         where_values.append(dict_val)
 
                 query = f"UPDATE {table_name} SET {set_clause} WHERE {where_clause}"
-                if verbose: print(f"\t{query}")
+                if verbose: print(f"\tSET: {set_values}, WHERE: {where_values}")
+                
                 self.cursor.execute(query, tuple(set_values + where_values))
 
-            self.connection.commit()
+            self.connector.commit()
             if verbose: print("Bulk update of database successful.")
 
         except sqlite3.Error as e:
-            self.connection.rollback()
+            self.connector.rollback()
             print(f"An error occurred: {e}")
 
         finally:
