@@ -18,28 +18,20 @@ For installing all modules in the package:
 
 ### To install package with optional dependencies:
 
-- Install only the SQLite utilities:
+- example: Install only the SQLite utilities:
 
         pip install PersonalPythonPackage[sqlite]
-
-- Install basic data analysis utilities:
-
-        pip install PersonalPythonPackage[basic_data_analysis]
-
-- Install the plotting utilities:
-
-        pip install PersonalPythonPackage[plotting_data_analysis]
-
-- Install PySide for UI:
-        
-        pip install PersonalPythonPackage[pyside]
-
-- Install Curses for terminal UI:
-
-        pip install PersonalPythonPackage[curses]
 
 - Install all utilities:
     
         pip install PersonalPythonPackage[sqlite, basic_data_analysis, plotting_data_analysis, pyside, curses]
 
+# Usage After Installation
+- SQLite utils:
+  
+        from personalpythonpackage.databases.sqlite_utils import DatabaseHandler
+
+- pandas_basic_utils:
+
+        from personalpythonpackage.data_analysis.pandas_basic_utils import *
 
