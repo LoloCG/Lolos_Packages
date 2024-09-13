@@ -1,11 +1,6 @@
 import os
 import pandas as pd
-r'''
-sys.path.append(r'C:\Users\Lolo\Desktop\Programming\GITRepo\PythonLearn-Resources\Data analysis\Pandas\Excel')
-from MODULE_pandas_excel_functions import ExcelDataExtract
-'''
-# ========================= MODULE_pandas_excel_functions/ExcelDataExtract =========================
-# =================================== 2024/02/09 =========================
+
 class ExcelDataExtract:
     def __init__(self, file_folder_dir = None, chosen_file = None):
         self.main_dir = os.path.dirname(os.path.abspath(__file__))
@@ -143,12 +138,12 @@ class ExcelGrapher:
 
     def add_excel_scatter_chart(self, output_excel_path): # TODO: Re-Do this whole function to make dynamic
         ''' 
-        Creates a line-scatter chart in excel using a DataFrame Dictionary.
-        
-        Parameters
-        output_excel_path (str): The file path for the output Excel file, including the .xlsx extension.
-        df_dict (dict): A dictionary where each key is a series name and each value is a DataFrame containing 
-                        numerical series data. Each DataFrame should have the same column names for X and Y values.
+            Creates a line-scatter chart in excel using a DataFrame Dictionary.
+            
+            Parameters
+            output_excel_path (str): The file path for the output Excel file, including the .xlsx extension.
+            df_dict (dict): A dictionary where each key is a series name and each value is a DataFrame containing 
+                            numerical series data. Each DataFrame should have the same column names for X and Y values.
         '''
         
         with pd.ExcelWriter(output_excel_path, engine="xlsxwriter") as writer:
