@@ -1,10 +1,6 @@
 import sqlite3
 import os
 
-r'''
-sys.path.append(r'C:\Users\Lolo\Desktop\Programming\GITRepo\PythonLearn-Resources\Databases\SQLite')
-import MODULE_SQLite_functions
-'''
 
 class DatabaseHandler:
     def __init__(self, db_dir, db_name=None):
@@ -34,17 +30,26 @@ class DatabaseHandler:
         self.main_table_name = None
         self.db_table_names = []
 
-    def create_db_table(self, table_items, table_name=None, verbose=False):
+    def create_db_table(self, table_items, table_name=None, 
+        verbose=False, foreign_keys=None, 
+        autoincrement_id=True, primary_key=None):
         '''
-        table_items (dict), key = str, item = SQLdatatype
-        mainTable_name (str)
-
+            table_items (dict): key = str (column name), item = SQL datatype
+            foreign_keys (dict): dictionary where each key is a foreign key column and 
+                the value is a tuple containing the referenced table and column
+                key = str (foreign key column), value = (referenced_table, referenced_column)
+            table_name (str): Name of the table
+            verbose (bool): Whether to print details during table creation
+            autoincrement_id (bool): Whether to automatically add an 'id' column with autoincrement.
+            primary_key (str): Column name to be set as the primary key (optional).
         '''
         if not self.check_db_existance():
             print(f"Setting database {self.db_name} with direction {self.db_path}")
 
         self.connector = sqlite3.connect(self.db_path)
         self.cursor = self.connector.cursor()
+        
+        if foreign_keys: self.cursor.execute("PRAGMA foreign_keys = ON")
 
         if table_name is None and self.main_table_name is None:
             self.main_table_name = 'main_table'
@@ -61,19 +66,37 @@ class DatabaseHandler:
                 print(f"\t{item}")
 
         columns = ", ".join([f'"{col}" {dtype}' for col, dtype in table_items.items()])
+        # Add foreign key constraints if provided
+        foreign_key_clauses = ""
+        if foreign_keys:
+            foreign_key_clauses = ", " + ", ".join([
+                f'FOREIGN KEY ("{fk_column}") REFERENCES {referenced_table}({referenced_column})'
+                for fk_column, (referenced_table, referenced_column) in foreign_keys.items()
+            ])
+
+        auto_id = ''
+        if autoincrement_id: auto_id = 'id INTEGER PRIMARY KEY AUTOINCREMENT,'
         
+        primary_key_clause = ''
+        if primary_key: primary_key_clause = f', PRIMARY KEY ("{primary_key}")'
+
         create_table_query = f'''
         CREATE TABLE IF NOT EXISTS {table_name} (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            {auto_id}
             {columns}
-        )
-        '''
+            {foreign_key_clauses}
+            {primary_key_clause}
+        )'''
+        
+        if verbose: print(f"Create Table Query: {create_table_query}")
+        
         self.cursor.execute(create_table_query)
         self.connector.commit()
 
     def convert_dict_valType_to_sqlType(self, dtype_dict,verbose=False):
         import numpy as np
         import pandas as pd
+        from datetime import date
 
         if verbose: print("Converting values from dtype to SQL type values...")
         
@@ -81,15 +104,14 @@ class DatabaseHandler:
         for key, item in dtype_dict.items():
 
             sql_type = None
-            # Use pandas and numpy functions to determine the dtype category
             if pd.api.types.is_integer_dtype(item) or isinstance(item, int):
                 sql_type = 'INTEGER'
-            elif pd.api.types.is_float_dtype(item) or isinstance(item, str):
+            elif pd.api.types.is_float_dtype(item) or isinstance(item, float):
                 sql_type = 'REAL'
-            elif pd.api.types.is_string_dtype(item) or item == 'O':  # 'O' for object types
+            elif pd.api.types.is_string_dtype(item) or isinstance(item, str):
                 sql_type = 'TEXT'
-            elif pd.api.types.is_datetime64_any_dtype(item):
-                sql_type = 'TEXT'  # alternatively, use DATETIME format if required...
+            elif isinstance(item, date) or pd.api.types.is_datetime64_any_dtype(item):
+                sql_type = 'TEXT'       # Store datetime.date as TEXT in 'YYYY-MM-DD' format
             elif item == list:
                 print(f"!!! - List datatype in dictionary ({key}). Will be stored as concatenated string.")
                 sql_type = 'TEXT'
@@ -206,14 +228,27 @@ class DatabaseHandler:
             print(f"An error occurred: {e}")
             return None
 
-    def get_last_table_value_of_columns(self, column_names, columns_to_order, table_name=None):
+    def get_last_table_value_of_columns(self, column_names, columns_to_order, 
+        table_name=None, limit='DESC', conditional=''):
+        '''
+            Retrieves the last value from a column in a table, with optional filtering.
+            
+            example usage:
+                column_names='microcycle_num', 
+                columns_to_order='microcycle_num', 
+                table_name='table_name',
+                conditional='weight_used IS NOT NULL'
+        '''
         if table_name is None:
             table_name = self.main_table_name
         
+        where_clause = f"WHERE {conditional}" if conditional else ""
+
         query = f"""
             SELECT {column_names}
             FROM {table_name}
-            ORDER BY {columns_to_order} DESC
+            {where_clause}
+            ORDER BY {columns_to_order} {limit}
             LIMIT 1;
             """
         
