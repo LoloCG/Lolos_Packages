@@ -5,8 +5,6 @@ r'''
 sys.path.append(r'C:\Users\Lolo\Desktop\Programming\GITRepo\PythonLearn-Resources\Databases\SQLite')
 import MODULE_SQLite_functions
 '''
-# ========================= MODULE_SQLite_functions/DatabaseHandler =========================
-# =================================== 05.09.2024 =========================
 
 class DatabaseHandler:
     def __init__(self, db_dir, db_name=None):
