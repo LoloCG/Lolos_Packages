@@ -15,6 +15,15 @@ A personal collection of reusable functions, classes, and utilities for data ana
 
 You can install this package directly from GitHub without needing to clone the repository, or you can clone it and install it locally. You also have the option to install specific modules or utilities based on your project needs.
 
+        pip install 'own_sqlite_orm[sqlite] @ git+https://github.com/LoloCG/PersonalPythonPackage.git'
+        
+        pip install 'own_sqlite_orm[sqlite_pandas] @ git+https://github.com/LoloCG/PersonalPythonPackage.git'
+
+        from own_sqlite_orm import SQLiteDatabase
+
+# Example usage
+db = SQLiteDatabase('my_database.db')
+
 ### Installing the Package without Cloning the Repository
 
 To install the entire package directly from GitHub:
@@ -25,9 +34,12 @@ To install the entire package directly from GitHub:
 
 If you only want to install specific modules (for example, the SQLite utilities):
 
-        pip install git+https://github.com/LoloCG/PersonalPythonPackage.git#egg=PersonalPythonPackage[sqlite]
+        pip install 'PersonalPythonPackage[sqlite] @ git+https://github.com/LoloCG/PersonalPythonPackage.git'
+
 
 You can replace sqlite with other options such as `pandas`, `plotting`, or `pyside` based on what you need.
+
+        pip install 'PersonalPythonPackage[pandas] @ git+https://github.com/LoloCG/PersonalPythonPackage.git'
 
 
 ### Cloning and Installing the Repository Locally

@@ -1,18 +1,19 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="PersonalPythonPackage",
-    version="0.2.0",
+    name="own_sqlite_orm",
+    version="0.2.1",
     author="LoloCG",
     author_email="",
-    description="My own collection of reusable functions and classes for several python libraries and other...",
+    description="Personal SQLite ORM for light weight applications.",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
     url="https://github.com/LoloCG/PersonalPythonPackage",
-    packages=find_packages(include=['personalpythonpackage', 'personalpythonpackage.*']),
-    install_requires=[],
+    packages=find_packages(include=['own_sqlite_orm', 'own_sqlite_orm.*']),
+    install_requires=[], # SQLite is built-in, so no base dependencies
     extras_require={
-        'pandas': ['pandas'], 
+        'sqlite': [],
+        'sqlite_pandas': ['pandas'],
     },
     classifiers=[
         "Programming Language :: Python :: 3",
