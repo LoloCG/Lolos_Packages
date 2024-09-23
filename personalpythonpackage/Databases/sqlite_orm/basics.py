@@ -1,13 +1,5 @@
 import sqlite3
 
-'''
-Basic CRUD Operations:
-    insert_data_from_dict
-    retrieve_rows_as_dicts
-    update_rows
-    delete_rows
-    retrieve_all_data_as_df (if you use Pandas frequently)
-'''
 class ORMManager:
     def __init__(self, db_name=None, db_path=None, auto_commit=True):
         self.db_name = db_name
@@ -185,6 +177,20 @@ class CRUDManager:
         if self.orm_manager.auto_commit:
             self.orm_manager.commit()  # Commit automatically if auto_commit is True
         return cursor
+
+    def insert_from_dict(self, data_dict):
+
+        # Construct the SQL query components
+        keys = ", ".join(data_dict.keys())
+        question_marks = ", ".join(["?" for _ in data_dict])
+        values = tuple(data_dict.values())
+
+        insert_query = f"INSERT INTO {self.table_name} ({keys}) VALUES ({question_marks})"
+        
+        self.cursor.execute(insert_query, values)
+
+        if self.orm_manager.auto_commit:
+            self.orm_manager.commit()  
 
 def convert_dict_valType_to_sqlType(self, dtype_dict, verbose=False):
     import numpy as np
@@ -484,30 +490,6 @@ class DatabaseHandler: # This is the old code
         else:
             if verbose: print(f"Table '{table_name}' does not exist.")
             return False
-
-    def insert_data_from_dict(self, data_dict, table_name,verbose=False):
-        
-        if not table_name:
-            table_name = self.main_table_name
-
-        # Construct the SQL query components
-        keys = ", ".join(data_dict.keys())
-        question_marks = ", ".join(["?" for _ in data_dict])
-        values = tuple(data_dict.values())
-
-        insert_query = f"INSERT INTO {table_name} ({keys}) VALUES ({question_marks})"
-        
-        # Execute the query with error handling
-        try:
-            self.cursor.execute(insert_query, values)
-            self.connector.commit()
-            if verbose: 
-                print(f"Data inserted successfully into {table_name}")
-                print(f"\tinserted: {len(values)} values ({values})")
-            
-        except sqlite3.Error as e:
-            print(f"An error occurred: {e}")
-            self.connector.rollback()
 
     def bulk_update_rows(self, update_list_dicts, update_cols_list, table_name=None, verbose=False):
         '''
