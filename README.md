@@ -16,12 +16,17 @@ This repository includes different packages, all of which can be installed from 
 
 ## SQLite ORM:
 For the basic module:
+        
+        pip install "own_sqlite_orm[sqlite] @ git+https://github.com/LoloCG/PersonalPythonPackage.git#subdirectory=Databases/own_sqlite_orm"
+        
+development branch:
 
-        pip install 'own_sqlite_orm[sqlite] @ git+https://github.com/LoloCG/PersonalPythonPackage.git'
+        pip install "own_sqlite_orm[sqlite] @ git+https://github.com/LoloCG/PersonalPythonPackage.git@development#subdirectory=Databases/own_sqlite_orm"
 
 If the Pandas module extras is required:
 
-        pip install 'own_sqlite_orm[sqlite_pandas] @ git+https://github.com/LoloCG/PersonalPythonPackage.git'
+        pip install "own_sqlite_orm[sqlite_pandas] @ git+https://github.com/LoloCG/PersonalPythonPackage.git#subdirectory=Databases/own_sqlite_orm"
+
 
 Inside the python file, the import can be made with:
 
