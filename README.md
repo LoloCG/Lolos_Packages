@@ -1,74 +1,42 @@
-# PersonalPythonPackage
+# Personal Python Packages
+
+A personal collection of lightweight packages for my own personal projects. Mostly created for Python projects.
+
+# Different packages
+- **SQLite ORM**: Lightweight SQLite ORM and utilities for database handling.
+  - Includes extras for functions with Pandas.
+- **Data Analysis tools**: Classes and independent functions dedicated to data-cleaning, plotting, excel usage, etc...
+- **UI tools**: At the moment, contains basic functions for basic addition of CLI functions.
 
 A personal collection of reusable functions, classes, and utilities for data analysis, database handling, user interfaces, and more. This package is designed to make your Python projects easier to manage and scale by providing a variety of custom modules for different tasks.
 
-## Features
+# Installation and usage
 
-- **Database Utilities**: Lightweight SQLite ORM and utilities for database handling.
-- **Data Analysis**: Custom functions and extensions for working with pandas.
-- **Plotting**: Functions for generating plots using `matplotlib`, `numpy`, and `pandas`.
-- **User Interfaces**: UI utilities using `PySide6` or terminal-based UIs with `curses`.
+This repository includes different packages, all of which can be installed from GitHub, either cloning the repository or installing locally.
 
----
-
-## Installation
-
-You can install this package directly from GitHub without needing to clone the repository, or you can clone it and install it locally. You also have the option to install specific modules or utilities based on your project needs.
+## SQLite ORM:
+For the basic module:
 
         pip install 'own_sqlite_orm[sqlite] @ git+https://github.com/LoloCG/PersonalPythonPackage.git'
-        
+
+If the Pandas module extras is required:
+
         pip install 'own_sqlite_orm[sqlite_pandas] @ git+https://github.com/LoloCG/PersonalPythonPackage.git'
 
-        from own_sqlite_orm import SQLiteDatabase
+Inside the python file, the import can be made with:
 
-# Example usage
-db = SQLiteDatabase('my_database.db')
+        from own_sqlite_orm import *
 
-### Installing the Package without Cloning the Repository
+## Example usage
 
-To install the entire package directly from GitHub:
+        from own_sqlite_orm import ORMManager, DBConnector, TableManager, CRUDManager, convert_dict_valType_to_sqlType
 
-        pip install git+https://github.com/LoloCG/PersonalPythonPackage.git
+        db = SQLiteDatabase('my_database.db')
 
-### Installing Specific Modules
+        columns = {
+        'col1': 'TEXT',
+        'col2': 'INTEGER'}
+        db.sql_dict_to_columns(columns)
+        db = ORMManager(db_name='example.db', db_path=None)
 
-If you only want to install specific modules (for example, the SQLite utilities):
-
-        pip install 'PersonalPythonPackage[sqlite] @ git+https://github.com/LoloCG/PersonalPythonPackage.git'
-
-
-You can replace sqlite with other options such as `pandas`, `plotting`, or `pyside` based on what you need.
-
-        pip install 'PersonalPythonPackage[pandas] @ git+https://github.com/LoloCG/PersonalPythonPackage.git'
-
-
-### Cloning and Installing the Repository Locally
-
-If you prefer to clone the repository and install it locally:
-
-        git clone https://github.com/LoloCG/PersonalPythonPackage.git
-
-Navigate to the root directory (where setup.py is located) and install the package in editable mode:
-
-    pip install -e .
-
-### Installing with Optional Dependencies
-
-You can install the package with optional dependencies based on the specific utilities you want to use.
-Example, installing only the SQLite utilities:
-
-        pip install PersonalPythonPackage[sqlite]
-
-Installing all utilities:
-
-        pip install PersonalPythonPackage[sqlite, pandas, plotting, pyside]
-
-## Usage After Installation
-Once the package is installed, you can import and use the available modules. 
-SQLite Utilities Example:
-
-        from personalpythonpackage.databases.sqlite_orm.basics import SQLiteDatabase
-
-        db = SQLiteDatabase('example.db')
-
-        db.execute('CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT)')
+        db.create_table(table_name='table_example.db')
