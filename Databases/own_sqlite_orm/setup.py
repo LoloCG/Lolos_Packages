@@ -6,7 +6,7 @@ setup(
     author="LoloCG",
     author_email="",
     description="Personal SQLite ORM for light weight applications.",
-    long_description=open("README.md").read(),
+    long_description="",
     long_description_content_type="text/markdown",
     url="https://github.com/LoloCG/PersonalPythonPackage",
     packages=find_packages(include=['own_sqlite_orm', 'own_sqlite_orm.*']),
