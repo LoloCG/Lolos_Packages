@@ -10,7 +10,7 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/LoloCG/PersonalPythonPackage",
     # packages=find_packages(include=['own_sqlite_orm', 'own_sqlite_orm.*']),
-    packages=['own_sqlite_orm'],  
+    packages=find_packages(),  
     install_requires=[], # SQLite is built-in, so no base dependencies
     extras_require={
         'sqlite': [],
