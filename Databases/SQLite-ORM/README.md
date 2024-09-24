@@ -1,20 +1,20 @@
 # Installation
 
-    pip install "own_sqlite_orm[sqlite] @ git+https://github.com/LoloCG/Lolos-Packages.git#subdirectory=Databases/own_sqlite_orm"
+    pip install "SQLite-ORM[sqlite] @ git+https://github.com/LoloCG/Lolos-Packages.git#subdirectory=Databases/SQLite-ORM"
 Development branch:
 
-    pip install "own_sqlite_orm[sqlite] @ git+https://github.com/LoloCG/Lolos-Packages.git@development#subdirectory=Databases/own_sqlite_orm"
+    pip install "SQLite-ORM[sqlite] @ git+https://github.com/LoloCG/Lolos-Packages.git@development#subdirectory=Databases/SQLite-ORM"
 
 ## Extras with dependencies
 
-- `own_sqlite_orm[sqlite_pandas]`
+- `SQLite-ORM[sqlite_pandas]`
 
-        pip install "own_sqlite_orm[sqlite_pandas] @ git+https://github.com/LoloCG/Lolos-Packages.git#subdirectory=Databases/own_sqlite_orm"
+        pip install "SQLite-ORM[sqlite_pandas] @ git+https://github.com/LoloCG/Lolos-Packages.git#subdirectory=Databases/SQLite-ORM"
 
 # Example usage:
 Basic python code:
 
-    from own_sqlite_orm.basics import *
+    from SQLite-ORM.basics import *
 
     # Initiate database manager instance
     db = DBManager(db_name='example.db', db_path=db_path) 
