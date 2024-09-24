@@ -187,24 +187,20 @@ class CRUDManager:
             
         self.connector.execute(insert_query, values)
 
-def convert_dict_valType_to_sqlType(self, dtype_dict, verbose=False):
-    import numpy as np
-    import pandas as pd
+def dict_to_sqlType(dtype_dict):
     from datetime import date
-
-    if verbose: print("Converting values from dtype to SQL type values...")
     
     sql_dict = {}
     for key, item in dtype_dict.items():
 
         sql_type = None
-        if pd.api.types.is_integer_dtype(item) or isinstance(item, int):
+        if isinstance(item, int): # pd.api.types.is_integer_dtype(item) or 
             sql_type = 'INTEGER'
-        elif pd.api.types.is_float_dtype(item) or isinstance(item, float):
+        elif isinstance(item, float): # pd.api.types.is_float_dtype(item) or 
             sql_type = 'REAL'
-        elif pd.api.types.is_string_dtype(item) or isinstance(item, str):
+        elif isinstance(item, str): # pd.api.types.is_string_dtype(item) or 
             sql_type = 'TEXT'
-        elif isinstance(item, date) or pd.api.types.is_datetime64_any_dtype(item):
+        elif isinstance(item, date): # or pd.api.types.is_datetime64_any_dtype(item)
             sql_type = 'TEXT'       # Store datetime.date as TEXT in 'YYYY-MM-DD' format
         elif item == list:
             print(f"!!! - List datatype in dictionary ({key}). Will be stored as concatenated string.")

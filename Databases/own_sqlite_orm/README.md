@@ -1,15 +1,15 @@
 # Installation
 
-    pip install "own_sqlite_orm[sqlite] @ git+https://github.com/LoloCG/PersonalPythonPackage.git#subdirectory=Databases/own_sqlite_orm"
+    pip install "own_sqlite_orm[sqlite] @ git+https://github.com/LoloCG/Lolos-Packages.git#subdirectory=Databases/own_sqlite_orm"
 Development branch:
 
-    pip install "own_sqlite_orm[sqlite] @ git+https://github.com/LoloCG/PersonalPythonPackage.git@development#subdirectory=Databases/own_sqlite_orm"
+    pip install "own_sqlite_orm[sqlite] @ git+https://github.com/LoloCG/Lolos-Packages.git@development#subdirectory=Databases/own_sqlite_orm"
 
 ## Extras with dependencies
 
 - `own_sqlite_orm[sqlite_pandas]`
 
-        pip install "own_sqlite_orm[sqlite_pandas] @ git+https://github.com/LoloCG/PersonalPythonPackage.git#subdirectory=Databases/own_sqlite_orm"
+        pip install "own_sqlite_orm[sqlite_pandas] @ git+https://github.com/LoloCG/Lolos-Packages.git#subdirectory=Databases/own_sqlite_orm"
 
 # Example usage:
 Basic python code:
