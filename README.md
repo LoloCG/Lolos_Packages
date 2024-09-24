@@ -15,33 +15,4 @@ A personal collection of reusable functions, classes, and utilities for data ana
 This repository includes different packages, all of which can be installed from GitHub, either cloning the repository or installing locally.
 
 ## SQLite ORM:
-For the basic module:
-        
-        pip install "own_sqlite_orm[sqlite] @ git+https://github.com/LoloCG/PersonalPythonPackage.git#subdirectory=Databases/own_sqlite_orm"
-        
-development branch:
-
-        pip install "own_sqlite_orm[sqlite] @ git+https://github.com/LoloCG/PersonalPythonPackage.git@development#subdirectory=Databases/own_sqlite_orm"
-
-If the Pandas module extras is required:
-
-        pip install "own_sqlite_orm[sqlite_pandas] @ git+https://github.com/LoloCG/PersonalPythonPackage.git#subdirectory=Databases/own_sqlite_orm"
-
-
-Inside the python file, the import can be made with:
-
-        from own_sqlite_orm import *
-
-## Example usage
-
-        from own_sqlite_orm import ORMManager, DBConnector, TableManager, CRUDManager, convert_dict_valType_to_sqlType
-
-        db = SQLiteDatabase('my_database.db')
-
-        columns = {
-        'col1': 'TEXT',
-        'col2': 'INTEGER'}
-        db.sql_dict_to_columns(columns)
-        db = ORMManager(db_name='example.db', db_path=None)
-
-        db.create_table(table_name='table_example.db')
+Consult the package README.md file [here](https://github.com/LoloCG/Lolos-Packages/Databases/own_sqlite_orm/README.md)
