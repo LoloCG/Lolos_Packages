@@ -11,9 +11,9 @@ setup(
     url="https://github.com/LoloCG/Lolos-Packages",
     # packages=find_packages(include=['SQLite-ORM', 'SQLite-ORM.*']),
     packages=find_packages(),
-    install_requires=[],
+    install_requires=['pandas'],
     extras_require={
-        'excel_import_export_utils': ['pandas'],
+        # 'excel_import_export_utils': ['pandas'],
     },
     classifiers=[
         "Programming Language :: Python :: 3",
