@@ -39,3 +39,16 @@ Context manager can be used with the connector:
 
     with db.connector: 
         # Rest of the code
+
+## Example usage with Pandas:
+
+    # Generate the manager object
+    db = DBManager(db_name=db_name, db_path=db_path)
+
+    # From it obtain connector object, and connect to database.
+    db.connector.connect()
+    connector_obj = db.get_connector()
+
+    # Use the connector for the dataframe function, and close connection.
+    insert_data_from_df(dataframe=df, connector_obj=connector_obj, table_name=main_table_name)
+    db.connector.close()
