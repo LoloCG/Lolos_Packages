@@ -32,7 +32,7 @@ def insert_data_from_df(dataframe, connector_obj, table_name):
     if not isinstance(dataframe, pd.DataFrame):
         raise TypeError(f"The variable passed to insert data to database is not dataframe type. It is '{type(dataframe)}'")
 
-    connection = connector.conn
+    connection = connector_obj.conn
 
     try:
         dataframe.to_sql(table_name, connection, if_exists='append', index=False)
