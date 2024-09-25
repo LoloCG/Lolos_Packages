@@ -15,41 +15,7 @@ class ExcelDataExtract:
         self.dataframe = None
         self.dataframe_type = None
 
-    def load_excel_to_dataframe_dict(self, selected_sheets=None, importNaN=True):
-        df_dict = {}
-        full_file_path = os.path.join(self.file_folder_dir, self.chosen_file)
-
-        sheets_to_load = selected_sheets if selected_sheets else self.selected_sheets
-
-        for sheet in self.selected_sheets:
-            print(f"loading {sheet} into dataframe dictionary")
-
-            df = pd.read_excel(full_file_path, sheet_name=sheet)
-            
-            if importNaN: # First drops columns that have NaN or empty string as headers, then columns where all values are NaN
-                df = df.loc[:, df.columns.notnull()]
-                df = df.loc[:, df.columns != '']
-                df = df.dropna(axis=1, how='all')
-                
-            df_dict[sheet] = df
-
-        self.dataframe = df_dict
-        self.dataframe_type = type(self.dataframe) # Ensures that the dataframe type is <class 'dict'>
-        
         #DEBUG: print(f"debug. df type: {self.dataframe_type}\n")
-
-    def load_csv_to_dataframe(self, chosen_file, encoding=None, delimiter=None, skiprows=None):
-        self.chosen_file = chosen_file
-
-        targetfile_path = os.path.join(self.file_folder_dir, self.chosen_file)
-        print(f"Extracting file {chosen_file} from path {targetfile_path}")
-        
-        df_raw = pd.read_csv(targetfile_path, encoding='utf-16', delimiter='\t', skiprows=1) # TODO: make dynamic selector of encoding, delimiter, skiprows...
-        
-        #DEBUG: print(f"Extracted df:\n{df_raw.head()}") 
-        #DEBUG: print(f"returning type: {type(df_raw)}")
-
-        self.dataframe = df_raw
 
     def get_folder_excel_files(self, file_folder_dir=None, file_type = None):
         '''
@@ -122,15 +88,6 @@ class ExcelDataExtract:
         
         print(f"selected sheets: {str(self.selected_sheets)}")
         print()
-
-    def detect_csv_delimiter(self): # TODO: finish this function
-        delimiters = [',', ';', '\\', '\t'] 
-        
-    def detect_csv_encoding(): # TODO: finish this function
-        encodings = ['utf-8', 'utf-8-sig', 'utf-16', 'latin1', 'iso-8859-1', 'cp1252']
-
-    def detect_csv_header_row():
-        print("TODO...")
 
 class ExcelGrapher:
     def __init__(self, dataframe: pd.DataFrame):
