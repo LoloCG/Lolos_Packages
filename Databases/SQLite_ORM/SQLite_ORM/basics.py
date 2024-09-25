@@ -127,7 +127,7 @@ class TableManager:
 
     def table_exists(self, table_name): # REFACTOR
         """Check if a specific table exists in the database"""
-        cursor = self.conn.cursor()
+        cursor = self.connector.conn.cursor()
         cursor.execute(f"SELECT name FROM sqlite_master WHERE type='table' AND name=?", (table_name,))
         table = cursor.fetchone()
         return table is not None
@@ -135,7 +135,8 @@ class TableManager:
     def table_rows(self, table_name):
         """Check the rows of a table"""
         try:
-            cursor = self.connector.execute(f"SELECT COUNT(*) FROM {table_name}")
+            cursor = self.connector.conn.cursor()
+            cursor.execute(f"SELECT COUNT(*) FROM {table_name}")
             row_count = cursor.fetchone()[0]
             return row_count
             
@@ -154,7 +155,8 @@ class TableManager:
         """Check if a table exists and has rows"""
         exists = self.table_exists(table_name)
         if exists:
-            has_rows = self.table_has_rows(table_name)
+            row_count = self.table_rows(table_name)
+            if row_count: has_rows = True
             return exists, has_rows
         else:
             return exists, False
