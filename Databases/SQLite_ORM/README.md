@@ -1,20 +1,17 @@
 # Installation
 
-    pip install "SQLite-ORM[sqlite] @ git+https://github.com/LoloCG/Lolos-Packages.git#subdirectory=Databases/SQLite-ORM"
-Development branch:
-
-    pip install "SQLite-ORM[sqlite] @ git+https://github.com/LoloCG/Lolos-Packages.git@development#subdirectory=Databases/SQLite-ORM"
+    pip install "SQLite_ORM[sqlite] @ git+https://github.com/LoloCG/Lolos-Packages.git#subdirectory=Databases/SQLite_ORM"
 
 ## Extras with dependencies
 
-- `SQLite-ORM[sqlite_pandas]`
+- `SQLite_ORM[pandas_addon]`
 
-        pip install "SQLite-ORM[sqlite_pandas] @ git+https://github.com/LoloCG/Lolos-Packages.git#subdirectory=Databases/SQLite-ORM"
+        pip install "SQLite_ORM[pandas_addon] @ git+https://github.com/LoloCG/Lolos-Packages.git#subdirectory=Databases/SQLite_ORM"
 
 # Example usage:
 Basic python code:
 
-    from SQLite-ORM.basics import *
+    from SQLite_ORM.basics import *
 
     # Initiate database manager instance
     db = DBManager(db_name='example.db', db_path=db_path) 

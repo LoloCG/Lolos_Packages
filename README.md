@@ -15,4 +15,4 @@ A personal collection of reusable functions, classes, and utilities for data ana
 This repository includes different packages, all of which can be installed from GitHub, either cloning the repository or installing locally.
 
 ## SQLite ORM:
-Consult the package README.md file [here](https://github.com/LoloCG/Lolos-Packages/Databases/SQLite-ORM/README.md)
+Consult the package README.md file [here](https://github.com/LoloCG/Lolos-Packages/Databases/SQLite_ORM/)
