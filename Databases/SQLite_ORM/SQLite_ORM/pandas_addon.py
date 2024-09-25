@@ -25,19 +25,20 @@ def retrieve_all_data_as_df(self, tableName=None): # Still not tested
     
     return df
 
-def insert_data_from_df(self, dataframe,table_name=None, verbose=False):
+def insert_data_from_df(dataframe, connector_obj, table_name):
     import pandas as pd
+    import sqlite3
+
     if not isinstance(dataframe, pd.DataFrame):
         raise TypeError(f"The variable passed to insert data to database is not dataframe type. It is '{type(dataframe)}'")
-    
-    if not table_name:
-        table_name = self.main_table_name
+
+    connection = connector.conn
 
     try:
-        dataframe.to_sql(table_name, self.connector, if_exists='append', index=False)
-        self.connector.commit()
-        if verbose: print(f"Data inserted successfully into {table_name}")
-        
+        dataframe.to_sql(table_name, connection, if_exists='append', index=False)
+        connection.commit()
+
     except sqlite3.Error as e:
         print(f"An error occurred: {e}")
-        self.connector.rollback()
+        connection.rollback()
+
