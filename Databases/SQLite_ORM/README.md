@@ -1,12 +1,12 @@
 # Installation
 
-    pip install "SQLite_ORM[sqlite] @ git+https://github.com/LoloCG/Lolos-Packages.git#subdirectory=Databases/SQLite_ORM"
+    pip install "SQLite_ORM[sqlite] @ git+https://github.com/LoloCG/Lolos_Packages.git#subdirectory=Databases/SQLite_ORM"
 
 ## Extras with dependencies
 
 - `SQLite_ORM[pandas_addon]`
 
-        pip install "SQLite_ORM[pandas_addon] @ git+https://github.com/LoloCG/Lolos-Packages.git#subdirectory=Databases/SQLite_ORM"
+        pip install "SQLite_ORM[pandas_addon] @ git+https://github.com/LoloCG/Lolos_Packages.git#subdirectory=Databases/SQLite_ORM"
 
 # Example usage:
 Basic python code:
