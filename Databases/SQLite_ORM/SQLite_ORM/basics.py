@@ -105,11 +105,12 @@ class TableManager:
         self.table_columns = ", ".join([f'"{col}" {dtype}' for col, dtype in items_dict.items()])
         return self
     
-    def add_primary_keys(self, primary_key):
+    def add_primary_key(self, primary_key):
         '''
             primary_key (str): Column name to be set as the primary key (optional).
         '''
-        self.primary_key_clause = f', PRIMARY KEY ("{primary_key}")'
+        if primary_key == None: self.primary_key_clause = None
+        else: self.primary_key_clause = f', PRIMARY KEY ("{primary_key}")'
         return self
 
     def add_foreign_keys(self, foreign_keys):
@@ -125,9 +126,10 @@ class TableManager:
             ])
         return self
 
-    def table_exists(self, table_name): # REFACTOR
+    def table_exists(self, table_name):
         """Check if a specific table exists in the database"""
-        cursor = self.conn.cursor()
+        
+        cursor = self.connector.conn.cursor()
         cursor.execute(f"SELECT name FROM sqlite_master WHERE type='table' AND name=?", (table_name,))
         table = cursor.fetchone()
         return table is not None
@@ -135,7 +137,8 @@ class TableManager:
     def table_rows(self, table_name):
         """Check the rows of a table"""
         try:
-            cursor = self.connector.execute(f"SELECT COUNT(*) FROM {table_name}")
+            cursor = self.connector.conn.cursor()
+            cursor.execute(f"SELECT COUNT(*) FROM {table_name}")
             row_count = cursor.fetchone()[0]
             return row_count
             
@@ -150,11 +153,11 @@ class TableManager:
             print(f"SQLite error: {e}")
             return None
 
-    def check_table(self, table_name): # REFACTOR
+    def check_table(self, table_name):
         """Check if a table exists and has rows"""
         exists = self.table_exists(table_name)
         if exists:
-            has_rows = self.table_has_rows(table_name)
+            has_rows = self.table_rows(table_name)
             return exists, has_rows
         else:
             return exists, False
