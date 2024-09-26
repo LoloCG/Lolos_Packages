@@ -94,6 +94,11 @@ class TableManager:
                 {primary_key_clause}
             )'''
         
+        # reset parameters:
+        self.foreign_key_clauses = None
+        self.primary_key_clause = None
+        self.table_columns = None
+        
         self.connector.execute(final_table_query)
 
         return self
