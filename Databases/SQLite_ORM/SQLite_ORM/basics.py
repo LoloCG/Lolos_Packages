@@ -94,6 +94,11 @@ class TableManager:
                 {primary_key_clause}
             )'''
         
+        # reset parameters:
+        self.foreign_key_clauses = None
+        self.primary_key_clause = None
+        self.table_columns = None
+        
         self.connector.execute(final_table_query)
 
         return self
@@ -162,12 +167,17 @@ class TableManager:
         else:
             return exists, False
 
-    def list_tables(self): # REFACTOR
+    def list_tables(self): # Not Tested
         """List all tables in the database"""
-        cursor = self.conn.cursor()
-        cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
+        query = ("SELECT name FROM sqlite_master WHERE type='table'")
+        cursor = self.connector.execute(query)
         tables = [table[0] for table in cursor.fetchall()]
         return tables
+
+    def describe_table(self, table_name): # Not Tested
+        query = f"PRAGMA table_info({table_name})"
+        cursor = self.connector.execute(query)
+        return cursor.fetchall()
 
 class CRUDManager:
     def __init__(self, connector):
@@ -176,8 +186,29 @@ class CRUDManager:
     def direct_execute(self, query, params=None):
         """Execute an SQL query and return the cursor"""
         
-        self.connector.execute(query, values)
+        self.connector.execute(query, params)
 
+    def get_column_names(conn, table_name):
+        """Retrieve column names from the specified table using PRAGMA"""
+        query = f"PRAGMA table_info({table_name})"
+        cursor = self.connector.execute(query)
+        columns = [row[1] for row in cursor.fetchall()]  # Column names are in the second position
+        return columns
+
+    # ==================== Reads ====================
+    def count_records(self, table_name, conditions=None): # Not Tested
+        query = f"SELECT COUNT(*) FROM {table_name}"
+        if conditions:
+            condition_str = " AND ".join([f"{key} = ?" for key in conditions.keys()])
+            query += f" WHERE {condition_str}"
+            
+            cursor = self.connector.execute(query, tuple(conditions.values()))
+
+        else:
+            cursor = self.connector.execute(query)
+        return cursor.fetchone()[0]
+
+    # ==================== Inserts ====================
     def insert_from_dict(self, data_dict, table_name):
         if not data_dict:
             raise ValueError("Cannot insert empty dictionary into database table.")
@@ -187,8 +218,60 @@ class CRUDManager:
         values = tuple(data_dict.values())
 
         insert_query = f"INSERT INTO {table_name} ({keys}) VALUES ({question_marks})"
-            
+        
         self.connector.execute(insert_query, values)
+
+    # ==================== Retrievals ====================
+    def retrieve_by_key(self, table_name, primary_key_name, primary_key_value): # Not Tested
+        query = f"SELECT * FROM {table_name} WHERE {primary_key_name} = ?"
+        
+        cursor = self.connector.execute(query, (primary_key_value,))
+        return cursor.fetchone()  
+
+    def retrieve_by_conditions(self, table_name, conditions):
+        '''
+            Parameters:
+                Conditions (dict): 
+        '''
+        query = f"SELECT * FROM {table_name} WHERE " + " AND ".join([f"{key} = ?" for key in conditions.keys()])
+        
+        cursor = self.connector.execute(query, tuple(conditions.values()))
+        return cursor.fetchall()
+
+    def retrieve_columns(self, table_name, *columns): # Not Tested
+        columns_str = ", ".join(columns) if columns else "*"
+        query = f"SELECT {columns_str} FROM {table_name}"
+        cursor = self.connector.execute(query)
+        return cursor.fetchall()
+
+    # ==================== Updates ====================
+    def update_by_primary_key(self, table_name, primary_key_name, primary_key_value, updates): # Not Tested
+        update_str = ", ".join([f"{key} = ?" for key in updates.keys()])
+        query = f"UPDATE {table_name} SET {update_str} WHERE {primary_key_name} = ?"
+        
+        cursor = self.connector.execute(query, (*updates.values(), primary_key_value))
+        self.connector.commit()
+
+    def update_by_condition(self, table_name, updates, conditions): # Not Tested
+        update_str = ", ".join([f"{key} = ?" for key in updates.keys()])
+        condition_str = " AND ".join([f"{key} = ?" for key in conditions.keys()])
+        query = f"UPDATE {table_name} SET {update_str} WHERE {condition_str}"
+        
+        cursor = self.connector.execute(query, (*updates.values(), *conditions.values()))
+        self.connector.commit()
+
+    def upsert(self, table_name, primary_key_name, primary_key_value, updates): # Not Tested
+        existing_record = self.retrieve_by_key(table_name, primary_key_name, primary_key_value)
+        
+        if existing_record: # Record exists, update it
+            self.update_by_primary_key(table_name, primary_key_name, primary_key_value, updates)
+        else:
+            columns = ", ".join(updates.keys())
+            placeholders = ", ".join("?" for _ in updates)
+            query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
+            
+            cursor = self.connector.execute(query, tuple(updates.values()))
+            self.connector.commit()
 
 def dict_to_sqlType(dtype_dict):
     from datetime import date
