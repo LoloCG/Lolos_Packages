@@ -8,8 +8,8 @@ setup(
     description="Personal Package for multiple Data Analysis uses.",
     long_description="",
     long_description_content_type="text/markdown",
-    url="https://github.com/LoloCG/Lolos-Packages",
-    # packages=find_packages(include=['SQLite-ORM', 'SQLite-ORM.*']),
+    url="https://github.com/LoloCG/Lolos_Packages",
+    # packages=find_packages(include=['', '']),
     packages=find_packages(),
     install_requires=['pandas'],
     extras_require={
