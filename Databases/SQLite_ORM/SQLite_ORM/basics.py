@@ -218,10 +218,10 @@ class CRUDManager:
     def retrieve_by_key(self, table_name, primary_key_name, primary_key_value): # Not Tested
         query = f"SELECT * FROM {table_name} WHERE {primary_key_name} = ?"
         
-        cursor = self.connector.execute(query, primary_key_value)
+        cursor = self.connector.execute(query, (primary_key_value,))
         return cursor.fetchone()  
 
-    def retrieve_by_conditions(self, table_name, conditions): # Not Tested
+    def retrieve_by_conditions(self, table_name, conditions):
         '''
             Parameters:
                 Conditions (dict): 
@@ -229,13 +229,12 @@ class CRUDManager:
         query = f"SELECT * FROM {table_name} WHERE " + " AND ".join([f"{key} = ?" for key in conditions.keys()])
         
         cursor = self.connector.execute(query, tuple(conditions.values()))
-        return cursor.fetchone()
+        return cursor.fetchall()
 
     def retrieve_columns(self, table_name, *columns): # Not Tested
-        columns_str = ", ".join(columns)
+        columns_str = ", ".join(columns) if columns else "*"
         query = f"SELECT {columns_str} FROM {table_name}"
         cursor = self.connector.execute(query)
-
         return cursor.fetchall()
 
     # ==================== Updates ====================
