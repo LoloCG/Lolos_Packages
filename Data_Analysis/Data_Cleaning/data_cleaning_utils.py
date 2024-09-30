@@ -13,7 +13,7 @@ class DFCleaner:
         
         return
 
-    def convert_df_dates(self, date_column, single_col=False):
+    def convert_df_dates(self, date_column, single_col=True, keep_original=True):
 
         df = self.dataframe
         
@@ -24,23 +24,25 @@ class DFCleaner:
             print(f"Warning: Column {date_column} is already datetime type.")
             return self
 
-        # TODO: add errorhandling for invalid date types
+        # TODO add errorhandling for invalid date types
 
-        df['date'] = pd.to_datetime(df[date_column])
-        df.drop(date_column, axis=1, inplace=True)
+        new_datecol = date_column if keep_original == True else 'date'
+        df[new_datecol] = pd.to_datetime(df[date_column], errors='coerce').dt.date # , , format="%d/%m/%Y"
+        if not keep_original: df.drop(date_column, axis=1, inplace=True)
 
-        if not single_col:
+        if single_col == False:
             # TODO: add error handling to fill NaN rows
-            df['year'] = df['date'].dt.year 
-            df['month'] = df['date'].dt.month 
-            df['day'] = df['date'].dt.day
-            df.drop('date', axis=1, inplace=True)
+            df['year'] = df[new_datecol].dt.year 
+            df['month'] = df[new_datecol].dt.month 
+            df['day'] = df[new_datecol].dt.day
         
+        if keep_original == False: df.drop(date_column, axis=1, inplace=True)
+
         self.dataframe = df
 
         return self
 
-    def convert_df_times(self, time_column, single_col=False, time_format='%H:%M'):
+    def convert_df_times(self, time_column, single_col=True, keep_original=True, time_format='%H:%M'):
         '''
         Converts a column with time in HH:MM format into datetime or separate columns for hours and minutes.
         '''
@@ -52,23 +54,27 @@ class DFCleaner:
             print(f"Warning: Column {time_column} is already in datetime type.")
             return self
 
-        # Ensure that the column contains strings and fill NaN values with a placeholder
-        df[time_column] = df[time_column].fillna('')
         if not pd.api.types.is_string_dtype(df[time_column]):
             df[time_column] = df[time_column].astype(str)
 
-        # errors='coerce' handles invalid formats by setting NaT
-        df['time'] = pd.to_datetime(df[time_column], format=time_format, errors='coerce')
-        df.drop(time_column, axis=1, inplace=True)
+        new_timecol = str(time_column) if keep_original == True else 'time'
+
+        df[new_timecol] = pd.to_datetime(df[time_column], errors='coerce', format=time_format)
          
-        if df['time'].isnull().any():
+        if df[new_timecol].isnull().any():
             print(f"Warning: Some values in column '{time_column}' could not be converted and are NaT.")
 
-        if not single_col:
-            df['hour'] = df['time'].dt.hour
-            df['minute'] = df['time'].dt.minute
-            df['second'] = df['time'].dt.second
-            df.drop('time', axis=1, inplace=True)
+        df[new_timecol] = df[new_timecol].dt.strftime(time_format)
+
+        # If single_col is False, split into hour, minute, and second (if applicable)
+        if single_col == False:
+            df['hour'] = pd.to_datetime(df[new_timecol], format=time_format).dt.hour
+            df['minute'] = pd.to_datetime(df[new_timecol], format=time_format).dt.minute
+            if '%S' in time_format:
+                df['second'] = pd.to_datetime(df[new_timecol], format=time_format).dt.second
+
+
+        if keep_original == False: df.drop(time_column, axis=1, inplace=True)
 
         self.dataframe = df
         return self

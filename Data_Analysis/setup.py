@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="Data-Analysis Tools",
-    version="v0.1.0",
+    version="v0.2.0",
     author="LoloCG",
     author_email="",
     description="Personal Package for multiple Data Analysis uses.",

@@ -19,3 +19,6 @@ Consult the package README.md file [here](https://github.com/LoloCG/Lolos_Packag
 
 ## Data-Analysis Packages:
 Consult the package README.md file [here](https://github.com/LoloCG/Lolos_Packages/blob/main/Data_Analysis/README.md)
+
+## CLINative
+    pip install "git+https://github.com/LoloCG/Lolos_Packages.git#subdirectory=UIs/CLI_native_tools"

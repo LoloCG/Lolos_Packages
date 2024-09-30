@@ -5,13 +5,18 @@ def call_function_from_choice(user_choice, options_funcs):
         Parameters:
         user_choice (int): The option number selected by the user.
         options_funcs (list): The list of functions corresponding to menu options.
+            example: 
+                option_funcs = [
+                    lambda: show_weekly_muscle_frequency(microcycle_1_obj),
+                    lambda: show_microcycle_sessions(microcycle_1_obj),
+                    lambda: show_meso_data(microcycle_1_obj)]
     """
     options_funcs[user_choice - 1]()
 
-def ask_loop_show_and_select_options(option_str_list, main_menu=False):
+def ask_loop_show_and_select_options(option_str_list, exit_msg):
     while True:
         try:
-            choice = show_and_select_options(option_str_list,main_menu)
+            choice = show_and_select_options(option_str_list, exit_msg)
 
             if 1 <= choice <= len(option_str_list):
                 return choice
@@ -21,20 +26,17 @@ def ask_loop_show_and_select_options(option_str_list, main_menu=False):
             print("Invalid choice, please enter a number.\n")
             continue
 
-def show_and_select_options(str_list, main_menu=False):
-    show_option_menu(options_text=str_list, main_menu=main_menu)
+def show_and_select_options(str_list, exit_msg=None):
+    show_option_menu(exit_msg=exit_msg, options_text=str_list)
     choice = select_option_from_menu(str_list)
     return choice
 
-def show_option_menu(options_text, main_menu=False):
-    
-    if main_menu: print("\nMain Menu\n") 
-
+def show_option_menu(options_text, exit_msg='Return'):
     for i, (option) in enumerate(options_text, 1):
         print(f"{i}. {option}")
-    if main_menu: print(f"{len(options_text) + 1}. Exit") 
-    else: print(f"{len(options_text) + 1}. Return")
-
+    
+    print(f"{len(options_text) + 1}. {exit_msg}") 
+    
 def select_option_from_menu(options_text): 
     choice = input("Enter your choice: ")
     print()
@@ -46,7 +48,7 @@ def select_option_from_menu(options_text):
         if 1 <= choice <= len(options_text):
             return choice
         elif choice == len(options_text) + 1:
-            print("\nSelected Exit option.")
+            # print("\nSelected Exit option.")
             return False
         else:
             print("Invalid choice, please enter again.\n")
