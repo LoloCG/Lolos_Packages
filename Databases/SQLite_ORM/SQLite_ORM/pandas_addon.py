@@ -58,14 +58,24 @@ def retrieve_columns_as_df(connector_obj, table_name, columns):
     return df
 
 def retrieve_as_df(connector_obj, table_name, conditions=None):
+    '''
+    Retrieves data from a specified SQL table and returns it as a pandas DataFrame. 
+        Allows for flexible querying with or without conditions
+    Parameters:
+        connector_obj: The database connector object that holds the connection to the database
+        conditions (dict, optional): A dictionary where keys are column names and 
+            values are the corresponding values to filter the data. 
+            If a value is a list, it will be treated as an IN clause (e.g., WHERE column IN (...)).
+    '''
     connection = connector_obj.conn if connector_obj.conn else connector_obj.connect()
     
     if not conditions:
         condition_query = ''
         params = None
     else:
-        condition_query = " WHERE " + " AND ".join([f"{key} = ?" for key in conditions.keys()])
-        params = tuple(conditions.values())
+        condition_query = " WHERE " + " AND ".join([f"{key} = ?" if not isinstance(value, list) else f"{key} IN ({','.join(['?'] * len(value))})" for key, value in conditions.items()])
+        # Flatten the parameter values if any are lists (for the IN clause)
+        params = tuple([item for value in conditions.values() for item in (value if isinstance(value, list) else [value])])
     
     query = f"SELECT * FROM {table_name} {condition_query}"
 

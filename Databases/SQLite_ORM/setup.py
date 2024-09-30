@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="SQLite-ORM",
-    version="v1.0.3",
+    version="v1.0.4",
     author="LoloCG",
     author_email="",
     description="Personal SQLite ORM for light weight applications.",
