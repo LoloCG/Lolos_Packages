@@ -236,8 +236,9 @@ class CRUDManager:
                                 If False, returns results as a list of tuples.
             conditions (dict): A dictionary of conditions to filter the query (e.g., {"id": 1}).
         '''
+        original_row_factory = self.connector.conn.row_factory
         if as_listdict:
-            self.connector.row_factory = sqlite3.Row
+            self.connector.conn.row_factory = sqlite3.Row
 
         condition_clause = ""
         if conditions is not None:
@@ -256,7 +257,7 @@ class CRUDManager:
         if as_listdict:
             rows = cursor.fetchall()
             dict_rows = [dict(row) for row in rows]
-            self.connector.row_factory = original_row_factory
+            self.connector.conn.row_factory = original_row_factory  
             return dict_rows
         else:
             return cursor.fetchall()
