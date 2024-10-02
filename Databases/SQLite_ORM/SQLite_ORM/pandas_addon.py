@@ -46,6 +46,54 @@ def insert_data_from_df(dataframe, connector_obj, table_name, if_exists='append'
         print(f"An error occurred: {e}")
         connection.rollback()
 
+def insert_newdata_from_df(dataframe, connector_obj, table_name, unique_cols=None):
+    '''
+        unique_cols (list): The column(s) used to determine uniqueness in the table.
+    '''
+    pass
+    if not isinstance(dataframe, pd.DataFrame):
+        raise TypeError(f"The variable passed to insert data to database is not dataframe type. It is '{type(dataframe)}'")
+
+    connection = connector_obj.conn
+    
+    where_clause = ''
+    if unique_cols is not None: 
+        where_clause = " WHERE " + " AND ".join([f'"{col}" = ?' for col in unique_cols])
+
+    query = f"SELECT * FROM {table_name} {where_clause}"
+    
+    try:
+        existing_data = pd.read_sql(
+            sql=query,
+            con=connection,
+            params=tuple(dataframe[unique_cols].iloc[0]))
+
+    except Exception as e:
+        print(f"Error querying existing data: {e}")
+        return
+    
+    if not existing_data.empty: # Filter out rows that already exist in the database
+        dataframe_to_insert = dataframe.merge(existing_data, on=unique_cols, how='left', indicator=True)
+        dataframe_to_insert = dataframe_to_insert[dataframe_to_insert['_merge'] == 'left_only'].drop(columns='_merge')
+    else:
+        dataframe_to_insert = dataframe
+    if dataframe_to_insert.empty:
+        print("No new data to insert.")
+        return
+        
+    try:
+        dataframe_to_insert.to_sql(
+            table_name, 
+            con=connection, 
+            if_exists='append', 
+            index=False)
+        connection.commit()
+        # print(f"Inserted {len(dataframe_to_insert)} new rows into {table_name}.")
+    
+    except sqlite3.Error as e:
+        print(f"An error occurred: {e}")
+        connection.rollback()
+
 def retrieve_columns_as_df(connector_obj, table_name, columns):
     '''
         Fetch specific columns from a SQLite table.
@@ -82,3 +130,48 @@ def retrieve_as_df(connector_obj, table_name, conditions=None):
     df = pd.read_sql_query(query, connection, params=params)
     
     return df
+
+def upsert_with_df(dataframe, connector_obj, table_name, unique_cols): # Not tested
+    ''' This code might be unoptimized... requires tested and possibly refactoring
+        Performs an upsert operation by checking if the row exists using WHERE clause.
+        
+        Args:
+            dataframe (pd.DataFrame): The data to insert or update.
+            connector_obj (object): The database connector object with an active connection.
+            table_name (str): The name of the target table.
+            unique_cols (list): A list of columns that together form a composite unique key.
+    '''
+    connection = connector_obj.conn
+    
+    for _, row in dataframe.iterrows():
+        # Create the WHERE clause for checking if the row exists
+        where_clause = ' AND '.join([f"{col} = ?" for col in unique_cols])
+        select_sql = f"SELECT 1 FROM {table_name} WHERE {where_clause}"
+        unique_vals = tuple(row[col] for col in unique_cols)
+        
+        try:
+            cursor = connection.cursor()
+            cursor.execute(select_sql, unique_vals)
+            result = cursor.fetchone() 
+            
+            if result:
+                # If row exists, perform an UPDATE
+                update_columns = [f"{col} = ?" for col in row.index if col not in unique_cols]
+                update_sql = f"UPDATE {table_name} SET {', '.join(update_columns)} WHERE {where_clause}"
+                update_values = tuple(row[col] for col in row.index if col not in unique_cols) + unique_vals
+                connection.execute(update_sql, update_values)
+                print(f"Updated row with {unique_vals} in {table_name}")
+            else:
+                # If row does not exist, perform an INSERT
+                insert_columns = ', '.join(row.index)
+                placeholders = ', '.join('?' * len(row))
+                insert_sql = f"INSERT INTO {table_name} ({insert_columns}) VALUES ({placeholders})"
+                connection.execute(insert_sql, tuple(row))
+                print(f"Inserted new row with {unique_vals} into {table_name}")
+            
+            connection.commit()
+
+        except sqlite3.Error as e:
+            print(f"An error occurred during upsert: {e}")
+            connection.rollback()
+
