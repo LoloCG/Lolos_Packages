@@ -228,15 +228,53 @@ class CRUDManager:
         cursor = self.connector.execute(query, (primary_key_value,))
         return cursor.fetchone()  
 
-    def retrieve_by_conditions(self, table_name, conditions):
+    def retrieve_by_conditions(self, table_name, as_listdict=False, conditions=None):
         '''
             Parameters:
-                Conditions (dict): 
+                table_name (str): The name of the table to query.
+                as_listdict (bool): If True, returns results as a list of dictionaries. 
+                                    If False, returns results as a list of tuples.
+                conditions (dict): A dictionary of conditions to filter the query (e.g., {"id": 1}).
         '''
-        query = f"SELECT * FROM {table_name} WHERE " + " AND ".join([f"{key} = ?" for key in conditions.keys()])
+        original_row_factory = self.connector.conn.row_factory
+        if as_listdict:
+            self.connector.conn.row_factory = sqlite3.Row
+
+        condition_clause = ""
+        query_params = []
+
+        if conditions is not None:
+            condition_parts = []
+            for key, value in conditions.items():
+                if isinstance(value, list): # Use IN clause for lists
+                    placeholders = ",".join("?" for _ in value)
+                    condition_parts.append(f"{key} IN ({placeholders})")
+                    query_params.extend(value)  # Add the list of values
+                
+                else: # Use equality for single values
+                    condition_parts.append(f"{key} = ?")
+                    query_params.append(value)
+
+            condition_clause = " WHERE " + " AND ".join(condition_parts)
+
+            
+        query = f"SELECT * FROM {table_name}{condition_clause}"
+        try:
+            if conditions is not None:
+                cursor = self.connector.execute(query, tuple(query_params))
+            else:
+                cursor = self.connector.execute(query)
+        except sqlite3.Error as e:
+            print(f"An error occurred: {e}")
+            return []
         
-        cursor = self.connector.execute(query, tuple(conditions.values()))
-        return cursor.fetchall()
+        if as_listdict:
+            rows = cursor.fetchall()
+            dict_rows = [dict(row) for row in rows]
+            self.connector.conn.row_factory = original_row_factory  
+            return dict_rows
+        else:
+            return cursor.fetchall()
 
     def retrieve_columns(self, table_name, *columns): # Not Tested
         columns_str = ", ".join(columns) if columns else "*"
