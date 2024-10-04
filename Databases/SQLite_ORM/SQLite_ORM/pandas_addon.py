@@ -49,8 +49,8 @@ def insert_data_from_df(dataframe, connector_obj, table_name, if_exists='append'
 def insert_newdata_from_df(dataframe, connector_obj, table_name, unique_cols=None):
     '''
         unique_cols (list): The column(s) used to determine uniqueness in the table.
+            If all the columns coincide, the data will not be added.
     '''
-    pass
     if not isinstance(dataframe, pd.DataFrame):
         raise TypeError(f"The variable passed to insert data to database is not dataframe type. It is '{type(dataframe)}'")
 
@@ -141,37 +141,50 @@ def upsert_with_df(dataframe, connector_obj, table_name, unique_cols): # Not tes
             table_name (str): The name of the target table.
             unique_cols (list): A list of columns that together form a composite unique key.
     '''
-    connection = connector_obj.conn
-    
+    connection = connector_obj.conn if connector_obj.conn else connector_obj.connect()
+
     for _, row in dataframe.iterrows():
         # Create the WHERE clause for checking if the row exists
-        where_clause = ' AND '.join([f"{col} = ?" for col in unique_cols])
-        select_sql = f"SELECT 1 FROM {table_name} WHERE {where_clause}"
-        unique_vals = tuple(row[col] for col in unique_cols)
+        where_clauses = []
+        unique_vals = []
+        
+        for col in unique_cols:
+            if pd.isnull(row[col]):  # Handle NULL values
+                where_clauses.append(f'"{col}" IS NULL')
+            else:
+                where_clauses.append(f'"{col}" = ?')
+                unique_vals.append(row[col])
+        
+        where_clause = ' AND '.join(where_clauses)
+        select_sql = f'SELECT 1 FROM "{table_name}" WHERE {where_clause}'
         
         try:
             cursor = connection.cursor()
             cursor.execute(select_sql, unique_vals)
-            result = cursor.fetchone() 
+            result = cursor.fetchone()
             
             if result:
-                # If row exists, perform an UPDATE
-                update_columns = [f"{col} = ?" for col in row.index if col not in unique_cols]
-                update_sql = f"UPDATE {table_name} SET {', '.join(update_columns)} WHERE {where_clause}"
-                update_values = tuple(row[col] for col in row.index if col not in unique_cols) + unique_vals
+                # If row exists, perform an UPDATE (escape column names)
+                update_columns = [f'"{col}" = ?' for col in row.index if col not in unique_cols]
+                update_sql = f'UPDATE "{table_name}" SET {", ".join(update_columns)} WHERE {where_clause}'
+                # update_values = tuple(row[col] for col in row.index if col not in unique_cols) + unique_vals
+                update_values = tuple(row[col] for col in row.index if col not in unique_cols) + tuple(unique_vals)
+
+                # print("Executing SQL (UPDATE):", update_sql, update_values)  # Debugging
                 connection.execute(update_sql, update_values)
-                print(f"Updated row with {unique_vals} in {table_name}")
+                # print(f"Updated row with {unique_vals} in {table_name}")
             else:
-                # If row does not exist, perform an INSERT
-                insert_columns = ', '.join(row.index)
+                # If row does not exist, perform an INSERT (escape column names)
+                insert_columns = ', '.join([f'"{col}"' for col in row.index])
                 placeholders = ', '.join('?' * len(row))
-                insert_sql = f"INSERT INTO {table_name} ({insert_columns}) VALUES ({placeholders})"
+                insert_sql = f'INSERT INTO "{table_name}" ({insert_columns}) VALUES ({placeholders})'
+
+                # print("Executing SQL (INSERT):", insert_sql, tuple(row))  # Debugging
                 connection.execute(insert_sql, tuple(row))
-                print(f"Inserted new row with {unique_vals} into {table_name}")
-            
+                # print(f"Inserted new row with {unique_vals} into {table_name}")
+
             connection.commit()
 
         except sqlite3.Error as e:
             print(f"An error occurred during upsert: {e}")
             connection.rollback()
-
