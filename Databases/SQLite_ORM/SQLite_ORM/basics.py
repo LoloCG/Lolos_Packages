@@ -231,13 +231,15 @@ class CRUDManager:
         cursor = self.connector.execute(query, (primary_key_value,))
         return cursor.fetchone()  
 
-    def retrieve_by_conditions(self, table_name, as_listdict=False, conditions=None):
+    def retrieve_by_conditions(self, table_name, as_listdict=False, conditions=None, order_by=None, limit=None):
         '''
             Parameters:
                 table_name (str): The name of the table to query.
                 as_listdict (bool): If True, returns results as a list of dictionaries. 
                                     If False, returns results as a list of tuples.
                 conditions (dict): A dictionary of conditions to filter the query (e.g., {"id": 1}).
+                order_by (str): The column to order the results by (e.g., 'timestamp DESC').
+                limit (int): The number of results to return (e.g., 1 for the latest).        
         '''
         original_row_factory = self.connector.conn.row_factory
         if as_listdict:
@@ -252,7 +254,7 @@ class CRUDManager:
                 if isinstance(value, list): # Use IN clause for lists
                     placeholders = ",".join("?" for _ in value)
                     condition_parts.append(f"{key} IN ({placeholders})")
-                    query_params.extend(value)  # Add the list of values
+                    query_params.extend(value)
                 
                 else: # Use equality for single values
                     condition_parts.append(f"{key} = ?")
@@ -260,8 +262,12 @@ class CRUDManager:
 
             condition_clause = " WHERE " + " AND ".join(condition_parts)
 
-            
-        query = f"SELECT * FROM {table_name}{condition_clause}"
+        order_by_clause = f" ORDER BY {order_by}" if order_by else ""
+
+        limit_clause = f" LIMIT {limit}" if limit else ""
+
+        query = f"SELECT * FROM {table_name}{condition_clause}{order_by_clause}{limit_clause}"
+
         try:
             if conditions is not None:
                 cursor = self.connector.execute(query, tuple(query_params))
