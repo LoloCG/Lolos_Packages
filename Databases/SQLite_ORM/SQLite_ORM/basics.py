@@ -68,7 +68,7 @@ class TableManager:
         self.foreign_key_clauses = None
         self.primary_key_clause = None
 
-    def create_table(self, table_name, autoincrement_id=True, table_cols=None, add_timestamp=True):
+    def create_table(self, table_name, autoincrement_id=True, table_cols=None, add_timestamp=False):
         '''
             autoincrement_id (bool): Whether to automatically add an 'id' column with autoincrement.
             add_timestamp (bool): Whether to automatically add a 'timestamp' column with default current timestamp.
@@ -91,8 +91,8 @@ class TableManager:
         final_table_query = f'''
             CREATE TABLE IF NOT EXISTS {table_name} (
                 {auto_id}
-                {columns}
                 {timestamp_col}
+                {columns}
                 {foreign_key_clauses}
                 {primary_key_clause}
             )'''
@@ -316,7 +316,6 @@ class CRUDManager:
             # Execute the insert query
             cursor = self.connector.execute(query, tuple(combined_data.values()))
             self.connector.commit()
-
         
     def upsert_by_primary_key(self, table_name, primary_key_name, primary_key_value, updates): # Not Tested
         existing_record = self.retrieve_by_key(table_name, primary_key_name, primary_key_value)
@@ -346,8 +345,8 @@ def dict_to_sqlType(dtype_dict):
             sql_type = 'TEXT'
         elif isinstance(item, date): # or pd.api.types.is_datetime64_any_dtype(item)
             sql_type = 'DATE'       # Store datetime.date as TEXT in 'YYYY-MM-DD' format
-        elif item == list:
-            print(f"!!! - List datatype in dictionary ({key}). Will be stored as concatenated string.")
+        elif isinstance(item, list):
+            # print(f"!!! - List datatype in dictionary ({key}). Will be stored as concatenated string.")
             sql_type = 'TEXT'
         else:
             raise ValueError(f"Unrecognized dtype ({type(item)}) key: {key}")
