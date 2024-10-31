@@ -21,31 +21,35 @@ class LoggerSingleton:
             if disable_third_party == False:
                 self.set_third_party_loggers_level(exception_level=main_log_level)
 
-    def set_logger_config(self, level='INFO', disable_third_party=False):
-        logging_config = {
-            'version': 1,
-            'disable_existing_loggers': disable_third_party,
-            'formatters': {
-                'basic': {
-                    'format': "{asctime} - {levelname} - {filename}: {message}",
-                    'style': "{",
-                    'datefmt': "%H:%M:%S",
-                }
-            },
-            'handlers': {
-                'stdout': {
-                    'class': 'logging.StreamHandler',
-                    'formatter': 'basic',
-                    'stream': 'ext://sys.stdout',
-                }
-            },
-            'loggers': {
-                'root': {
-                    'level': level,
-                    'handlers': ['stdout'],
-                }
-            },
-        }
+    def set_logger_config(self, level='INFO', custom_config=None, disable_third_party=False):
+        
+        if custom_config:
+            logging.config.dictConfig(custom_config)
+        else:
+            logging_config = {
+                'version': 1,
+                'disable_existing_loggers': disable_third_party,
+                'formatters': {
+                    'basic': {
+                        'format': "{asctime} - {levelname} - {filename} - {funcName}: {message}",
+                        'style': "{",
+                        'datefmt': "%H:%M:%S",
+                    }
+                },
+                'handlers': {
+                    'stdout': {
+                        'class': 'logging.StreamHandler',
+                        'formatter': 'basic',
+                        'stream': 'ext://sys.stdout',
+                    }
+                },
+                'loggers': {
+                    'root': {
+                        'level': level,
+                        'handlers': ['stdout'],
+                    }
+                },
+            }
 
         logging.config.dictConfig(logging_config)
 
