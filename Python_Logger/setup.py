@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="PyLogger_tools",
-    version="v0.2.0",
+    version="v0.3.0",
     author="LoloCG",
     author_email="",
     description="Personal native logger module for python.",
